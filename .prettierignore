@@ -1,0 +1,8 @@
+.expo
+.husky
+.vscode
+node_modules
+dist
+coverage
+android
+ios
