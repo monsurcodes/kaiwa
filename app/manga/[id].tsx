@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Manga = () => {
    const { id } = useLocalSearchParams();
    return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-primary">
+      <SafeAreaView className="flex-1 items-center justify-center">
          <Text className="text-white">manga: {id}</Text>
       </SafeAreaView>
    );

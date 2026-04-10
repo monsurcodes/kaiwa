@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Index = () => {
    return (
-      <SafeAreaView className="flex-1 bg-primary">
+      <SafeAreaView className="flex-1">
          <Text className="text-3xl text-emerald-500">Home screen</Text>
 
          <Link href="/anime/apple" asChild>
