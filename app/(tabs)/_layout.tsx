@@ -7,7 +7,9 @@ const _layout = () => {
    return (
       <Tabs
          screenOptions={{
-            // tabBarShowLabel: false,
+            sceneStyle: {
+               backgroundColor: "#030014",
+            },
             tabBarItemStyle: {
                width: "100%",
                height: "100%",
@@ -44,6 +46,7 @@ const _layout = () => {
             options={{
                title: "Home",
                headerShown: false,
+               animation: "shift",
                tabBarIcon: ({ focused }) => (
                   <View className="mt-2 size-full items-center justify-center rounded-full">
                      <Home size={24} color={focused ? "#4ade80" : "#9ca3af"} />
@@ -56,6 +59,7 @@ const _layout = () => {
             options={{
                title: "Library",
                headerShown: false,
+               animation: "shift",
                tabBarIcon: ({ focused }) => (
                   <View className="mt-2 size-full items-center justify-center rounded-full">
                      <BookOpen size={24} color={focused ? "#4ade80" : "#9ca3af"} />
@@ -68,6 +72,7 @@ const _layout = () => {
             options={{
                title: "Forum",
                headerShown: false,
+               animation: "shift",
                tabBarIcon: ({ focused }) => (
                   <View className="mt-2 size-full items-center justify-center rounded-full">
                      <MessageSquare size={24} color={focused ? "#4ade80" : "#9ca3af"} />
@@ -80,6 +85,7 @@ const _layout = () => {
             options={{
                title: "Profile",
                headerShown: false,
+               animation: "shift",
                tabBarIcon: ({ focused }) => (
                   <View className="mt-2 size-full items-center justify-center rounded-full">
                      <User size={24} color={focused ? "#4ade80" : "#9ca3af"} />
