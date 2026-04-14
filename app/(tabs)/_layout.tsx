@@ -3,12 +3,13 @@ import { BookOpen, Home, MessageSquare, User } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
 
-const _layout = () => {
+const Layout = () => {
    return (
       <Tabs
          screenOptions={{
             sceneStyle: {
                backgroundColor: "#030014",
+               padding: 1,
             },
             tabBarItemStyle: {
                width: "100%",
@@ -97,4 +98,4 @@ const _layout = () => {
    );
 };
 
-export default _layout;
+export default Layout;
