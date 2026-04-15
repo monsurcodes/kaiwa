@@ -9,7 +9,7 @@ const Layout = () => {
          screenOptions={{
             sceneStyle: {
                backgroundColor: "#030014",
-               padding: 1,
+               paddingHorizontal: 10,
             },
             tabBarItemStyle: {
                width: "100%",
@@ -23,22 +23,22 @@ const Layout = () => {
             tabBarStyle: {
                justifyContent: "center",
                alignItems: "center",
-               marginBottom: 20,
-               marginHorizontal: 20,
-               borderRadius: 20,
-               height: 60,
-               position: "absolute",
-               overflow: "hidden",
+               // marginBottom: 20,
+               // marginHorizontal: 20,
+               // borderRadius: 20,
+               height: 65,
+               // position: "absolute",
+               // overflow: "hidden",
                backgroundColor: "#0f0D23",
                borderTopWidth: 0, // removes the white line at the top of the tab bar
-               shadowColor: "#000",
-               shadowOffset: {
-                  width: 0,
-                  height: 2,
-               },
-               shadowOpacity: 0.25,
-               shadowRadius: 3.84,
-               elevation: 5,
+               // shadowColor: "#000",
+               // shadowOffset: {
+               //    width: 0,
+               //    height: 2,
+               // },
+               // shadowOpacity: 0.25,
+               // shadowRadius: 3.84,
+               // elevation: 5,
             },
          }}
       >
