@@ -43,7 +43,7 @@ export default function RootLayout() {
                      screenOptions={{
                         contentStyle: {
                            backgroundColor: "#030014",
-                           padding: 1,
+                           // paddingTop: 1,
                         },
                         animation: "fade_from_bottom",
                      }}
