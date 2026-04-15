@@ -1,59 +1,41 @@
-import React, { useState } from "react";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import React from "react";
+import { Image, ScrollView, Text, View } from "react-native";
+import { useQuery } from "urql";
 
-import { useAuthStore } from "@/stores/authStore";
+import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
+import { type AuthUserDataInterface } from "@/types/authUserDataInterface";
 
 const Profile = () => {
-   const [inputValue, setInputValue] = useState("");
+   const [authUser] = useQuery<AuthUserDataInterface["data"]>({
+      query: GetAuthUserDataQuery,
+   });
 
-   const setUser = useAuthStore((state) => state.setUser);
+   const { data, fetching, error } = authUser;
 
-   const currentUser = useAuthStore((state) => state.user);
+   if (error) console.error("Error fetching authenticated user data:", error);
 
-   const handleSetUser = () => {
-      if (!inputValue.trim()) {
-         Alert.alert("Error", "Please enter a valid name");
-         return;
-      }
-
-      setUser({
-         id: Date.now(),
-         name: inputValue,
-         avatar: "https://i.pravatar.cc/150?img=3",
-      });
-
-      setInputValue("");
-
-      Alert.alert("Success", "User has been set in the store!");
-   };
+   // console.log("Authenticated User Data:", data);
 
    return (
-      <View>
-         <Text className="text-3xl text-emerald-500">Profile Screen</Text>
-         <View>
-            <Text className="mb-2 font-semibold text-white">Current User:</Text>
-            <Text className="mb-6 italic text-emerald-400" numberOfLines={1}>
-               {currentUser?.name || "No user set"}
+      <View className="w-full flex-1">
+         <ScrollView className="flex-1" contentContainerStyle={{ alignItems: "center" }}>
+            {fetching && <Text className="text-white">Loading...</Text>}
+            <View className="relative flex w-full items-center">
+               <Image
+                  source={{ uri: data?.Viewer.bannerImage }}
+                  className="h-52 w-full rounded-lg"
+               />
+               <Image
+                  source={{ uri: data?.Viewer.avatar.large }}
+                  className="absolute -bottom-20 h-40 w-40 rounded-full border-4 border-[#030014]"
+               />
+            </View>
+            <Text className="mt-20 text-xl font-semibold text-white">
+               Hello, {data?.Viewer.name}!
             </Text>
 
-            <TextInput
-               className="mb-4 rounded-lg border border-white/20 bg-white/10 p-4 text-white"
-               placeholder="Enter new user name..."
-               placeholderTextColor="#9ca3af"
-               value={inputValue}
-               onChangeText={setInputValue}
-            />
-
-            <TouchableOpacity
-               onPress={handleSetUser}
-               className="rounded-lg bg-emerald-500 p-4 active:bg-emerald-600"
-            >
-               <Text className="text-center text-lg font-bold text-[#030014]">
-                  Update Auth Store
-               </Text>
-            </TouchableOpacity>
-         </View>
+            <Text className="text-white">{data?.Viewer.about}</Text>
+         </ScrollView>
       </View>
    );
 };
