@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, Text, View } from "react-native";
 import { useQuery } from "urql";
 
 import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
@@ -14,7 +14,12 @@ const Profile = () => {
 
    if (error) console.error("Error fetching authenticated user data:", error);
 
-   // console.log("Authenticated User Data:", data);
+   if (fetching)
+      return (
+         <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size={30} />
+         </View>
+      );
 
    return (
       <View className="w-full flex-1">
