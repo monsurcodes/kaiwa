@@ -86,7 +86,7 @@ const TrendingMediaCard = ({
          <View className="px-2">
             {genres.length > 0 && (
                <View className="my-2 flex-row flex-wrap gap-1">
-                  {genres.map((genre) => (
+                  {genres.slice(0, 5).map((genre) => (
                      <View key={genre} className="rounded-md bg-slate-700 px-2 py-1">
                         <Text className="text-xs text-white">{genre}</Text>
                      </View>
