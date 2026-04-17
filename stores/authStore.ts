@@ -3,19 +3,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import { storage } from "@/lib/storage/mmkv";
 
-interface User {
-   id: number;
-   name: string;
-   avatar: string;
-}
-
 interface AuthState {
    token: string | null;
    expiresAt: number | null;
-   user: User | null;
    isLoggedIn: boolean;
    setToken: (token: string, expiresAt: number) => void;
-   setUser: (user: User | null) => void;
    logout: () => void;
 }
 
@@ -36,9 +28,7 @@ export const useAuthStore = create<AuthState>()(
 
          setToken: (token, expiresAt) => set({ token, expiresAt, isLoggedIn: true }),
 
-         setUser: (user) => set({ user }),
-
-         logout: () => set({ token: null, expiresAt: null, user: null, isLoggedIn: false }),
+         logout: () => set({ token: null, expiresAt: null, isLoggedIn: false }),
       }),
       {
          name: "auth-storage", // The master key in MMKV
@@ -47,7 +37,6 @@ export const useAuthStore = create<AuthState>()(
          partialize: (state) => ({
             token: state.token,
             expiresAt: state.expiresAt,
-            user: state.user,
             isLoggedIn: state.isLoggedIn,
          }),
       },
