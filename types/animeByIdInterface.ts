@@ -9,7 +9,7 @@ export type AnimeByIdInterface = {
          };
          bannerImage: string;
          coverImage: {
-            large: string;
+            extraLarge: string;
          };
          description: string;
          averageScore: number;
@@ -67,6 +67,21 @@ export type AnimeByIdInterface = {
                id: number;
                relationType: string;
                node: {
+                  id: number;
+                  type: string;
+                  title: {
+                     english: string;
+                     romaji: string;
+                  };
+                  coverImage: {
+                     large: string;
+                  };
+               };
+            }[];
+         };
+         recommendations: {
+            nodes: {
+               mediaRecommendation: {
                   id: number;
                   type: string;
                   title: {
