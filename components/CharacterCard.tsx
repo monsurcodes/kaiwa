@@ -11,8 +11,7 @@ interface CharacterCardProps {
 const CharacterCard = ({ id, name, image, role }: CharacterCardProps) => {
    return (
       <Pressable
-         style={{ width: 95, height: 165 }}
-         className="mr-2 overflow-hidden"
+         className="mr-3 h-[170] w-[95] overflow-hidden"
          onPress={() => console.log(`Character ID: ${id}`)}
       >
          <Image source={{ uri: image }} className="h-[120] w-[95] rounded-md" />

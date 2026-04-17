@@ -22,8 +22,7 @@ const RelationCard = ({ id, relationType, type, title, image }: RelationCardProp
 
    return (
       <Pressable
-         style={{ width: 150, height: 270 }}
-         className="mr-2 overflow-hidden"
+         className="mr-3 h-[260] w-[150] overflow-hidden"
          onPress={() => handleOnPress(type)}
       >
          <Image source={{ uri: image }} className="relative h-[200] w-[150] rounded-lg" />
