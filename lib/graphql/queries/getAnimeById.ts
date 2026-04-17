@@ -11,7 +11,7 @@ export const GetAnimeByIdQuery = gql`
          }
          bannerImage
          coverImage {
-            large
+            extraLarge
          }
          description
          averageScore
@@ -70,6 +70,32 @@ export const GetAnimeByIdQuery = gql`
                relationType
                node {
                   id
+                  title {
+                     english
+                     romaji
+                  }
+                  coverImage {
+                     large
+                  }
+                  type
+               }
+            }
+         }
+         nextAiringEpisode {
+            episode
+            airingAt
+            timeUntilAiring
+         }
+         tags {
+            name
+            description
+            isMediaSpoiler
+            id
+         }
+         recommendations {
+            nodes {
+               mediaRecommendation {
+                  id
                   type
                   title {
                      english
@@ -80,17 +106,6 @@ export const GetAnimeByIdQuery = gql`
                   }
                }
             }
-         }
-         nextAiringEpisode {
-            episode
-            airingAt
-            timeUntilAiring
-         }
-         tags {
-            id
-            name
-            description
-            isMediaSpoiler
          }
       }
    }
