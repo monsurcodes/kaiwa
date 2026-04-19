@@ -43,13 +43,15 @@ export default function RootLayout() {
                      screenOptions={{
                         contentStyle: {
                            backgroundColor: "#030014",
-                           // paddingTop: 1,
                         },
-                        animation: "fade_from_bottom",
+                        animation: "slide_from_left",
                      }}
                   >
                      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                     <Stack.Screen name="anime/[id]" options={{ headerShown: false }} />
+                     <Stack.Screen
+                        name="anime/[id]"
+                        options={{ headerShown: false, animation: "slide_from_right" }}
+                     />
                      <Stack.Screen name="manga/[id]" options={{ headerShown: false }} />
                      <Stack.Screen name="auth/login" options={{ headerShown: false }} />
                      <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
