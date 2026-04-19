@@ -87,10 +87,11 @@ export const GetAnimeByIdQuery = gql`
             timeUntilAiring
          }
          tags {
+            id
             name
+            rank
             description
             isMediaSpoiler
-            id
          }
          recommendations {
             nodes {

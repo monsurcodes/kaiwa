@@ -102,6 +102,7 @@ export type AnimeByIdInterface = {
          tags: {
             id: number;
             name: string;
+            rank: number;
             description: string;
             isMediaSpoiler: boolean;
          }[];
