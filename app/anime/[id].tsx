@@ -1,7 +1,8 @@
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { EllipsisVertical, X } from "lucide-react-native";
 import React, { useState } from "react";
 import {
    ActivityIndicator,
@@ -19,6 +20,7 @@ import CharacterCard from "@/components/CharacterCard";
 import HtmlText from "@/components/HtmlText";
 import RecommendationCard from "@/components/RecommendationCard";
 import RelationCard from "@/components/RelationCard";
+import TagCard from "@/components/TagCard";
 import TrailerCard from "@/components/TrailerCard";
 import { GetAnimeByIdQuery } from "@/lib/graphql/queries/getAnimeById";
 import { formatAiringDate } from "@/lib/utils/date";
@@ -38,12 +40,31 @@ if (
 }
 
 const Anime = () => {
+   const router = useRouter();
+   const [revealedTagIds, setRevealedTagIds] = useState<number[]>([]);
+
+   // close button and option button handlers
+   const handleScreenClose = () => {
+      router.replace("/(tabs)");
+   };
+
+   const handleOptionPress = () => {
+      // Implement option button logic, e.g., show action sheet
+      console.log("Option button pressed");
+   };
+
    // synopsis expand/collapse
    const [isExpanded, setIsExpanded] = useState(false);
 
    const toggleExpand = () => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setIsExpanded(!isExpanded);
+   };
+
+   const handleRevealTag = (tagId: number) => {
+      setRevealedTagIds((current) =>
+         current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId],
+      );
    };
 
    const { id } = useLocalSearchParams();
@@ -70,7 +91,16 @@ const Anime = () => {
       return <Text className="flex-1 items-center justify-center text-white">Anime not found</Text>;
 
    return (
-      <View>
+      <View className="flex-1">
+         <View className="absolute left-1 right-1 top-2 z-20 h-10 flex-row items-center justify-between">
+            <Pressable className="rounded-full bg-black/55 p-2" onPress={handleScreenClose}>
+               <X color="white" size={20} />
+            </Pressable>
+            <Pressable className="rounded-full bg-black/55 p-2" onPress={handleOptionPress}>
+               <EllipsisVertical color="white" size={20} />
+            </Pressable>
+         </View>
+
          <ScrollView
             className="min-h-screen flex-1"
             showsVerticalScrollIndicator={false}
@@ -151,9 +181,12 @@ const Anime = () => {
                />
 
                {/* synopsis */}
-               <View className="mb-6 flex-1">
+               <View className="mb-6">
                   <Text className="mb-2 text-lg font-semibold text-white">Synopsis</Text>
-                  <Pressable onPress={toggleExpand}>
+                  <Pressable
+                     onPress={toggleExpand}
+                     className="rounded-md bg-slate-900/70 px-4 py-2"
+                  >
                      <HtmlText
                         htmlContent={data.Media.description ?? ""}
                         numberOfLines={isExpanded ? undefined : 4}
@@ -164,11 +197,6 @@ const Anime = () => {
                      </Text>
                   </Pressable>
                </View>
-
-               {/* youtube trailer */}
-               {data.Media.trailer && data.Media.trailer.site === "youtube" && (
-                  <TrailerCard videoId={data.Media.trailer.id} />
-               )}
 
                {/* characters */}
                <View>
@@ -183,6 +211,158 @@ const Anime = () => {
                            name={item.node.name.full}
                            image={item.node.image.large}
                            role={item.role}
+                        />
+                     )}
+                  />
+               </View>
+
+               {/* Info */}
+               <View className="">
+                  <Text className="mb-2 text-lg font-semibold text-white">Info</Text>
+                  <View className="mb-2 gap-2 rounded-md bg-slate-900/70 px-4 py-2">
+                     {/* format */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Format</Text>
+                        </View>
+                        <View className="w-1/2">
+                           <Text className="text-white">{data.Media.format}</Text>
+                        </View>
+                     </View>
+
+                     {/* episodes */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Episodes</Text>
+                        </View>
+                        <View className="w-1/2">
+                           <Text className="text-white">{data.Media.episodes}</Text>
+                        </View>
+                     </View>
+
+                     {/* episodes duration */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Episode Duration</Text>
+                        </View>
+                        <View className="w-1/2">
+                           <Text className="text-white">{data.Media.duration} minutes</Text>
+                        </View>
+                     </View>
+
+                     {/* source */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Source</Text>
+                        </View>
+                        <View className="w-1/2">
+                           <Text className="text-white">
+                              {data.Media.source.split("_").join(" ")}
+                           </Text>
+                        </View>
+                     </View>
+
+                     {/* status */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Status</Text>
+                        </View>
+                        <View className="w-1/2">
+                           <Text className="text-white">{data.Media.status}</Text>
+                        </View>
+                     </View>
+
+                     {/* start date */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Start Date</Text>
+                        </View>
+                        <View className="w-1/2">
+                           <Text className="text-white">
+                              {data.Media.startDate.year}-{data.Media.startDate.month}-
+                              {data.Media.startDate.day}
+                           </Text>
+                        </View>
+                     </View>
+
+                     {/* end date */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">End Date</Text>
+                        </View>
+                        <View className="w-1/2">
+                           <Text className="text-white">
+                              {data.Media.endDate.year}-{data.Media.endDate.month}-
+                              {data.Media.endDate.day}
+                           </Text>
+                        </View>
+                     </View>
+
+                     {/* season */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Season</Text>
+                        </View>
+                        <View className="w-1/2">
+                           <Text className="text-white">
+                              {data.Media.season} {data.Media.startDate.year}
+                           </Text>
+                        </View>
+                     </View>
+                  </View>
+
+                  <View className="mb-6 gap-2 rounded-md bg-slate-900/70 px-4 py-2">
+                     {/* studio */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Studio</Text>
+                        </View>
+                        <View className="w-1/2">
+                           {data.Media.studios.edges
+                              .filter((studio) => studio.isMain)
+                              .map((studio) => (
+                                 <Text key={studio.id} className="text-white">
+                                    {studio.node.name}
+                                 </Text>
+                              ))}
+                        </View>
+                     </View>
+
+                     {/* producers */}
+                     <View className="flex-row">
+                        <View className="w-1/2">
+                           <Text className="text-white">Producers</Text>
+                        </View>
+                        <View className="w-1/2">
+                           {data.Media.studios.edges
+                              .filter((studio) => !studio.node.isAnimationStudio)
+                              .map((studio) => (
+                                 <Text key={studio.id} className="text-white">
+                                    {studio.node.name}
+                                 </Text>
+                              ))}
+                        </View>
+                     </View>
+                  </View>
+               </View>
+
+               {/* tags */}
+               <View>
+                  <Text className="mb-2 text-lg font-semibold text-white">Tags</Text>
+                  <FlashList
+                     data={data.Media.tags}
+                     className="mb-6"
+                     horizontal
+                     keyExtractor={(item) => item.id.toString()}
+                     renderItem={({ item }) => (
+                        <TagCard
+                           id={item.id}
+                           name={item.name}
+                           description={item.description}
+                           rank={item.rank}
+                           spoiler={item.isMediaSpoiler}
+                           isRevealed={revealedTagIds.includes(item.id)}
+                           onReveal={handleRevealTag}
                         />
                      )}
                   />
@@ -206,6 +386,11 @@ const Anime = () => {
                      )}
                   />
                </View>
+
+               {/* youtube trailer */}
+               {data.Media.trailer && data.Media.trailer.site === "youtube" && (
+                  <TrailerCard videoId={data.Media.trailer.id} />
+               )}
 
                {/* recommendations */}
                <View>
