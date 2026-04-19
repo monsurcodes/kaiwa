@@ -1,7 +1,10 @@
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+
+import HtmlText from "./HtmlText";
 
 interface TrendingMediaCardProps {
    mediaType: "ANIME" | "MANGA";
@@ -33,6 +36,9 @@ const TrendingMediaCard = ({
    cardWidth,
 }: TrendingMediaCardProps) => {
    const router = useRouter();
+   const heroImageUri = (bannerImage || coverImage || "").trim();
+   const posterImageUri = (coverImage || bannerImage || "").trim();
+
    const handleOnPress = (mediaType: "ANIME" | "MANGA") => {
       if (mediaType === "ANIME") {
          router.push(`/anime/${id}`);
@@ -47,11 +53,24 @@ const TrendingMediaCard = ({
          onPress={() => handleOnPress(mediaType)}
       >
          <View className="relative h-60">
-            <Image
-               source={{ uri: bannerImage || coverImage }}
-               className="absolute inset-0 h-full w-full"
-               resizeMode="cover"
-            />
+            {heroImageUri ? (
+               <Image
+                  source={{ uri: heroImageUri }}
+                  style={{
+                     position: "absolute",
+                     top: 0,
+                     right: 0,
+                     bottom: 0,
+                     left: 0,
+                     width: "100%",
+                     height: "100%",
+                  }}
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+               />
+            ) : (
+               <View className="absolute inset-0 bg-slate-800" />
+            )}
 
             <LinearGradient
                colors={["transparent", "rgba(0,0,0,0.9)"]}
@@ -59,7 +78,21 @@ const TrendingMediaCard = ({
             >
                <View className="flex-row items-end">
                   <View className="shadow-lg">
-                     <Image source={{ uri: coverImage }} className="mr-2 h-40 w-28 rounded-md" />
+                     {posterImageUri ? (
+                        <Image
+                           source={{ uri: posterImageUri }}
+                           style={{
+                              marginRight: 8,
+                              width: 112,
+                              height: 160,
+                              borderRadius: 6,
+                           }}
+                           contentFit="cover"
+                           cachePolicy="memory-disk"
+                        />
+                     ) : (
+                        <View className="mr-2 h-40 w-28 rounded-md bg-slate-800" />
+                     )}
                   </View>
                   <View className="flex-1 pb-1">
                      <Text className="text-lg font-bold leading-tight text-white">
@@ -93,9 +126,7 @@ const TrendingMediaCard = ({
                   ))}
                </View>
             )}
-            <Text className="overflow-hidden text-white" numberOfLines={6}>
-               {description.replace(/<[^>]+>/g, "")}
-            </Text>
+            <HtmlText htmlContent={description} textColor="white" numberOfLines={6} />
          </View>
       </Pressable>
    );
