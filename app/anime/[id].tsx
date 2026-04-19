@@ -1,10 +1,10 @@
 import { FlashList } from "@shopify/flash-list";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import {
    ActivityIndicator,
-   Image,
    LayoutAnimation,
    Platform,
    Pressable,
@@ -13,31 +13,31 @@ import {
    View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import YoutubePlayer from "react-native-youtube-iframe";
 import { useQuery } from "urql";
 
 import CharacterCard from "@/components/CharacterCard";
+import HtmlText from "@/components/HtmlText";
 import RecommendationCard from "@/components/RecommendationCard";
 import RelationCard from "@/components/RelationCard";
+import TrailerCard from "@/components/TrailerCard";
 import { GetAnimeByIdQuery } from "@/lib/graphql/queries/getAnimeById";
 import { formatAiringDate } from "@/lib/utils/date";
 import { AnimeByIdInterface } from "@/types/animeByIdInterface";
 
+const isNewArchitectureEnabled = Boolean(
+   (global as typeof globalThis & { nativeFabricUIManager?: unknown }).nativeFabricUIManager,
+);
+
 // Enable LayoutAnimation for Android (Required for smooth transitions)
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+   Platform.OS === "android" &&
+   !isNewArchitectureEnabled &&
+   UIManager.setLayoutAnimationEnabledExperimental
+) {
    UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 const Anime = () => {
-   // youtube trailer
-   const [playing, setPlaying] = useState(false);
-
-   const onStateChange = useCallback((state: string) => {
-      if (state === "ended") {
-         setPlaying(false);
-      }
-   }, []);
-
    // synopsis expand/collapse
    const [isExpanded, setIsExpanded] = useState(false);
 
@@ -80,8 +80,17 @@ const Anime = () => {
             <View className="relative h-64">
                <Image
                   source={{ uri: data.Media.bannerImage || data.Media.coverImage.extraLarge }}
-                  className="absolute inset-0 h-full w-full"
-                  resizeMode="cover"
+                  style={{
+                     position: "absolute",
+                     top: 0,
+                     right: 0,
+                     bottom: 0,
+                     left: 0,
+                     width: "100%",
+                     height: "100%",
+                  }}
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
                />
 
                <LinearGradient
@@ -94,7 +103,14 @@ const Anime = () => {
                            source={{
                               uri: data.Media.coverImage.extraLarge || data.Media.bannerImage,
                            }}
-                           className="mr-2 h-40 w-28 rounded-md"
+                           style={{
+                              marginRight: 8,
+                              width: 112,
+                              height: 160,
+                              borderRadius: 6,
+                           }}
+                           contentFit="cover"
+                           cachePolicy="memory-disk"
                         />
                      </View>
                      <View className="flex-1 gap-1 pb-1">
@@ -138,12 +154,10 @@ const Anime = () => {
                <View className="mb-6 flex-1">
                   <Text className="mb-2 text-lg font-semibold text-white">Synopsis</Text>
                   <Pressable onPress={toggleExpand}>
-                     <Text
-                        className="leading-5 text-gray-300"
+                     <HtmlText
+                        htmlContent={data.Media.description ?? ""}
                         numberOfLines={isExpanded ? undefined : 4}
-                     >
-                        {data.Media.description}
-                     </Text>
+                     />
 
                      <Text className="mt-1 text-xs font-bold text-white">
                         {isExpanded ? "Show Less" : "Read More..."}
@@ -153,17 +167,7 @@ const Anime = () => {
 
                {/* youtube trailer */}
                {data.Media.trailer && data.Media.trailer.site === "youtube" && (
-                  <View className="mb-8 w-full bg-slate-900">
-                     <YoutubePlayer
-                        height={220}
-                        play={playing}
-                        videoId={data.Media.trailer.id}
-                        onChangeState={onStateChange}
-                        webViewProps={{
-                           allowsFullscreenVideo: true,
-                        }}
-                     />
-                  </View>
+                  <TrailerCard videoId={data.Media.trailer.id} />
                )}
 
                {/* characters */}
