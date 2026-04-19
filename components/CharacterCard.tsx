@@ -1,5 +1,6 @@
+import { Image } from "expo-image";
 import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 interface CharacterCardProps {
    id: number;
@@ -9,12 +10,23 @@ interface CharacterCardProps {
 }
 
 const CharacterCard = ({ id, name, image, role }: CharacterCardProps) => {
+   const imageUri = (image || "").trim();
+
    return (
       <Pressable
          className="mr-3 h-[170] w-[95] overflow-hidden"
          onPress={() => console.log(`Character ID: ${id}`)}
       >
-         <Image source={{ uri: image }} className="h-[120] w-[95] rounded-md" />
+         {imageUri ? (
+            <Image
+               source={{ uri: imageUri }}
+               style={{ width: 95, height: 120, borderRadius: 6 }}
+               contentFit="cover"
+               cachePolicy="memory-disk"
+            />
+         ) : (
+            <View className="h-[120] w-[95] rounded-md bg-slate-800" />
+         )}
          <View className="flex-1 px-2 py-1">
             <Text className="text-[13px] font-medium text-white">{name}</Text>
             <Text className="text-[10px] font-medium text-gray-400">{role}</Text>
