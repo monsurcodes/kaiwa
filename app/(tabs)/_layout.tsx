@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { BookOpen, Home, MessageSquare, User } from "lucide-react-native";
+import { BookOpen, Home, MessageSquare, Search, User } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
 
@@ -23,22 +23,9 @@ const Layout = () => {
             tabBarStyle: {
                justifyContent: "center",
                alignItems: "center",
-               // marginBottom: 20,
-               // marginHorizontal: 20,
-               // borderRadius: 20,
                height: 65,
-               // position: "absolute",
-               // overflow: "hidden",
                backgroundColor: "#0f0D23",
                borderTopWidth: 0, // removes the white line at the top of the tab bar
-               // shadowColor: "#000",
-               // shadowOffset: {
-               //    width: 0,
-               //    height: 2,
-               // },
-               // shadowOpacity: 0.25,
-               // shadowRadius: 3.84,
-               // elevation: 5,
             },
          }}
       >
@@ -64,6 +51,19 @@ const Layout = () => {
                tabBarIcon: ({ focused }) => (
                   <View className="mt-2 size-full items-center justify-center rounded-full">
                      <BookOpen size={24} color={focused ? "#4ade80" : "#9ca3af"} />
+                  </View>
+               ),
+            }}
+         />
+         <Tabs.Screen
+            name="search"
+            options={{
+               title: "Search",
+               headerShown: false,
+               animation: "shift",
+               tabBarIcon: ({ focused }) => (
+                  <View className="mt-2 size-full items-center justify-center rounded-full">
+                     <Search size={24} color={focused ? "#4ade80" : "#9ca3af"} />
                   </View>
                ),
             }}
