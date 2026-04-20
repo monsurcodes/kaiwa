@@ -23,7 +23,7 @@ import RelationCard from "@/components/RelationCard";
 import TagCard from "@/components/TagCard";
 import TrailerCard from "@/components/TrailerCard";
 import { GetAnimeByIdQuery } from "@/lib/graphql/queries/getAnimeById";
-import { formatAiringDate } from "@/lib/utils/date";
+import { formatAiringDate, getMonth } from "@/lib/utils/date";
 import { AnimeByIdInterface } from "@/types/animeByIdInterface";
 
 const isNewArchitectureEnabled = Boolean(
@@ -168,6 +168,27 @@ const Anime = () => {
             </View>
 
             <View className="flex-1 p-4">
+               <View className="mx-auto mb-4 h-16 w-3/4 flex-row items-center justify-around rounded-md bg-slate-900/70 px-2 py-1">
+                  <View className="flex items-center gap-2">
+                     <Text className="text-white">{data.Media.averageScore}</Text>
+                     <Text className="text-sm font-semibold text-white">Score</Text>
+                  </View>
+
+                  <View className="h-[30px] w-[1px] bg-gray-400/50" />
+
+                  <View className="flex items-center gap-2">
+                     <Text className="text-white">{data.Media.favourites}</Text>
+                     <Text className="text-sm font-semibold text-white">Favourites</Text>
+                  </View>
+
+                  <View className="h-[30px] w-[1px] bg-gray-400/50" />
+
+                  <View className="flex items-center gap-2">
+                     <Text className="text-white">{data.Media.popularity}</Text>
+                     <Text className="text-sm font-semibold text-white">Popularity</Text>
+                  </View>
+               </View>
+
                {/* genres */}
                <FlashList
                   data={data.Media.genres}
@@ -236,7 +257,9 @@ const Anime = () => {
                            <Text className="text-white">Episodes</Text>
                         </View>
                         <View className="w-1/2">
-                           <Text className="text-white">{data.Media.episodes}</Text>
+                           <Text className="text-white">
+                              {data.Media.episodes ? data.Media.episodes : "?"}
+                           </Text>
                         </View>
                      </View>
 
@@ -246,7 +269,9 @@ const Anime = () => {
                            <Text className="text-white">Episode Duration</Text>
                         </View>
                         <View className="w-1/2">
-                           <Text className="text-white">{data.Media.duration} minutes</Text>
+                           <Text className="text-white">
+                              {data.Media.duration ? `${data.Media.duration} minutes` : "?"}
+                           </Text>
                         </View>
                      </View>
 
@@ -268,7 +293,9 @@ const Anime = () => {
                            <Text className="text-white">Status</Text>
                         </View>
                         <View className="w-1/2">
-                           <Text className="text-white">{data.Media.status}</Text>
+                           <Text className="text-white">
+                              {data.Media.status.split("_").join(" ")}
+                           </Text>
                         </View>
                      </View>
 
@@ -279,7 +306,7 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.startDate.year}-{data.Media.startDate.month}-
+                              {data.Media.startDate.year} {getMonth(data.Media.startDate.month)}{" "}
                               {data.Media.startDate.day}
                            </Text>
                         </View>
@@ -292,8 +319,8 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.endDate.year}-{data.Media.endDate.month}-
-                              {data.Media.endDate.day}
+                              {data.Media.endDate.year ? data.Media.endDate.year : "?"}{" "}
+                              {getMonth(data.Media.endDate.month)} {data.Media.endDate.day}
                            </Text>
                         </View>
                      </View>
