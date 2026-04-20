@@ -1,6 +1,8 @@
 import { FlashList } from "@shopify/flash-list";
+import { useRouter } from "expo-router";
+import { Search } from "lucide-react-native";
 import React from "react";
-import { ActivityIndicator, Dimensions, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, View } from "react-native";
 import { useQuery } from "urql";
 
 import TrendingMediaCard from "@/components/TrendingMediaCard";
@@ -8,12 +10,17 @@ import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
 import { PopularAnimeInterface } from "@/types/popularAnimeInterface";
-import { type TrendingAnimeInterface } from "@/types/trendingAnimeInterface";
-import { type TrendingMangaInterface } from "@/types/trendingMangaInterface";
+import { TrendingAnimeInterface } from "@/types/trendingAnimeInterface";
+import { TrendingMangaInterface } from "@/types/trendingMangaInterface";
+
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;
 
 const Index = () => {
+   const router = useRouter();
+   const handleSearchPress = () => {
+      router.push("/search");
+   };
    // trending anime
    const [animeResult] = useQuery<TrendingAnimeInterface["data"]>({
       query: GetTrendingAnimeQuery,
@@ -58,6 +65,14 @@ const Index = () => {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
          >
+            {/* search bar */}
+            <Pressable onPress={handleSearchPress} className="mt-2 rounded-md bg-slate-900/70 p-4">
+               <View className="flex-row items-center">
+                  <Search color="white" size={20} />
+                  <Text className="ml-2 text-xl text-gray-400/70">What are you looking for?</Text>
+               </View>
+            </Pressable>
+
             {/* Trending Anime */}
             {animeList && (
                <Text className="mb-2 mt-6 text-xl font-semibold text-white">Trending Anime</Text>
