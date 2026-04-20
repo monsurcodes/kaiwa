@@ -45,7 +45,7 @@ const RelationCard = ({ id, relationType, type, title, image }: RelationCardProp
             <Text className="mt-1 text-white" numberOfLines={2}>
                {title}
             </Text>
-            <Text className="mt-2 text-sm text-gray-400">{relationType}</Text>
+            <Text className="mt-2 text-sm text-gray-400">{relationType.split("_").join(" ")}</Text>
          </View>
       </Pressable>
    );
