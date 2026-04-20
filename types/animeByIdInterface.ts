@@ -14,6 +14,7 @@ export type AnimeByIdInterface = {
          description: string;
          averageScore: number;
          favourites: number;
+         popularity: number;
          format: string;
          episodes: number;
          duration: number;

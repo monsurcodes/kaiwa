@@ -16,6 +16,7 @@ export const GetAnimeByIdQuery = gql`
          description
          averageScore
          favourites
+         popularity
          format
          episodes
          duration
