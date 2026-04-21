@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { Heart, Star } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
 import HtmlText from "./HtmlText";
@@ -99,11 +100,13 @@ const TrendingMediaCard = ({
                      )}
 
                      <View className="flex-row items-center gap-3">
-                        <View className="flex-row items-center">
-                           <Text className="text-white">⭐ {score}</Text>
+                        <View className="flex-row items-center justify-center gap-1">
+                           <Star color="#ffe840" fill="#ffe840" size={13} />
+                           <Text className="text-white">{score}</Text>
                         </View>
-                        <View className="flex-row items-center">
-                           <Text className="text-white">❤️ {likes}</Text>
+                        <View className="flex-row items-center justify-center gap-1">
+                           <Heart color="#ff4d4d" fill="#ff4d4d" size={13} />
+                           <Text className="text-white">{likes}</Text>
                         </View>
                      </View>
                   </View>
