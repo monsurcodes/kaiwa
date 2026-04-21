@@ -39,20 +39,6 @@ export const GetAnimeByIdQuery = gql(/* GraphQL */ `
             month
             year
          }
-         characters(sort: ROLE) {
-            edges {
-               role
-               node {
-                  id
-                  name {
-                     full
-                  }
-                  image {
-                     large
-                  }
-               }
-            }
-         }
          studios {
             edges {
                id
