@@ -1,6 +1,14 @@
 import { Tabs } from "expo-router";
-import { BookOpen, Home, MessageSquare, Search, User } from "lucide-react-native";
+import { BookOpen, Home, type LucideIcon, MessageSquare, Search, User } from "lucide-react-native";
 import { View } from "react-native";
+
+const TabBarIcon = ({ Icon, isFocused }: { Icon: LucideIcon; isFocused: boolean }) => {
+   return (
+      <View className="p-45 mt-2 size-full items-center justify-center rounded-full">
+         <Icon size={24} color={isFocused ? "white" : "#9ca3af"} />
+      </View>
+   );
+};
 
 const Layout = () => {
    return (
@@ -16,8 +24,11 @@ const Layout = () => {
                justifyContent: "center",
                alignItems: "center",
             },
+            tabBarActiveTintColor: "#ffffff",
+            tabBarInactiveTintColor: "#9ca3af",
             tabBarLabelStyle: {
                fontSize: 12,
+               marginTop: 4,
             },
             tabBarStyle: {
                justifyContent: "center",
@@ -25,6 +36,7 @@ const Layout = () => {
                height: 65,
                backgroundColor: "#0f0D23",
                borderTopWidth: 0, // removes the white line at the top of the tab bar
+               paddingHorizontal: 10,
             },
          }}
       >
@@ -34,11 +46,7 @@ const Layout = () => {
                title: "Home",
                headerShown: false,
                animation: "shift",
-               tabBarIcon: ({ focused }) => (
-                  <View className="mt-2 size-full items-center justify-center rounded-full">
-                     <Home size={24} color={focused ? "#4ade80" : "#9ca3af"} />
-                  </View>
-               ),
+               tabBarIcon: ({ focused }) => <TabBarIcon Icon={Home} isFocused={focused} />,
             }}
          />
          <Tabs.Screen
@@ -47,11 +55,7 @@ const Layout = () => {
                title: "Library",
                headerShown: false,
                animation: "shift",
-               tabBarIcon: ({ focused }) => (
-                  <View className="mt-2 size-full items-center justify-center rounded-full">
-                     <BookOpen size={24} color={focused ? "#4ade80" : "#9ca3af"} />
-                  </View>
-               ),
+               tabBarIcon: ({ focused }) => <TabBarIcon Icon={BookOpen} isFocused={focused} />,
             }}
          />
          <Tabs.Screen
@@ -60,11 +64,7 @@ const Layout = () => {
                title: "Search",
                headerShown: false,
                animation: "shift",
-               tabBarIcon: ({ focused }) => (
-                  <View className="mt-2 size-full items-center justify-center rounded-full">
-                     <Search size={24} color={focused ? "#4ade80" : "#9ca3af"} />
-                  </View>
-               ),
+               tabBarIcon: ({ focused }) => <TabBarIcon Icon={Search} isFocused={focused} />,
             }}
          />
          <Tabs.Screen
@@ -73,11 +73,7 @@ const Layout = () => {
                title: "Forum",
                headerShown: false,
                animation: "shift",
-               tabBarIcon: ({ focused }) => (
-                  <View className="mt-2 size-full items-center justify-center rounded-full">
-                     <MessageSquare size={24} color={focused ? "#4ade80" : "#9ca3af"} />
-                  </View>
-               ),
+               tabBarIcon: ({ focused }) => <TabBarIcon Icon={MessageSquare} isFocused={focused} />,
             }}
          />
          <Tabs.Screen
@@ -86,11 +82,7 @@ const Layout = () => {
                title: "Profile",
                headerShown: false,
                animation: "shift",
-               tabBarIcon: ({ focused }) => (
-                  <View className="mt-2 size-full items-center justify-center rounded-full">
-                     <User size={24} color={focused ? "#4ade80" : "#9ca3af"} />
-                  </View>
-               ),
+               tabBarIcon: ({ focused }) => <TabBarIcon Icon={User} isFocused={focused} />,
             }}
          />
       </Tabs>
