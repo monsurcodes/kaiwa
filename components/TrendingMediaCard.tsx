@@ -1,7 +1,6 @@
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React from "react";
 import { Pressable, Text, View } from "react-native";
 
 import HtmlText from "./HtmlText";
@@ -10,7 +9,6 @@ interface TrendingMediaCardProps {
    mediaType: "ANIME" | "MANGA";
    id: number;
    title: string;
-   altTitle: string;
    score: number;
    likes: number;
    coverImage: string;
@@ -25,7 +23,6 @@ const TrendingMediaCard = ({
    mediaType,
    id,
    title,
-   altTitle,
    score,
    likes,
    coverImage,
@@ -95,9 +92,7 @@ const TrendingMediaCard = ({
                      )}
                   </View>
                   <View className="flex-1 pb-1">
-                     <Text className="text-lg font-bold leading-tight text-white">
-                        {title || altTitle}
-                     </Text>
+                     <Text className="text-lg font-bold leading-tight text-white">{title}</Text>
 
                      {secondText && (
                         <Text className="mb-1 font-medium text-white">{secondText}</Text>
