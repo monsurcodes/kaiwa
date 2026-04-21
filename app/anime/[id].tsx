@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { EllipsisVertical, X } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
    ActivityIndicator,
    LayoutAnimation,
@@ -22,8 +22,16 @@ import RecommendationCard from "@/components/RecommendationCard";
 import RelationCard from "@/components/RelationCard";
 import TagCard from "@/components/TagCard";
 import TrailerCard from "@/components/TrailerCard";
+import type { GetMediaCharactersQuery as GetMediaCharactersData } from "@/lib/graphql/generated/graphql";
 import { GetAnimeByIdQuery } from "@/lib/graphql/queries/getAnimeById";
+import { GetMediaCharactersQuery } from "@/lib/graphql/queries/getMediaCharacters";
 import { formatAiringDate, getMonth } from "@/lib/utils/date";
+
+type CharacterEdge = NonNullable<
+   NonNullable<
+      NonNullable<NonNullable<GetMediaCharactersData["Media"]>["characters"]>["edges"]
+   >[number]
+>;
 
 const isNewArchitectureEnabled = Boolean(
    (global as typeof globalThis & { nativeFabricUIManager?: unknown }).nativeFabricUIManager,
@@ -66,7 +74,9 @@ const Anime = () => {
       );
    };
 
+   // data fetching
    const { id } = useLocalSearchParams();
+
    const [anime] = useQuery({
       query: GetAnimeByIdQuery,
       variables: {
@@ -74,6 +84,41 @@ const Anime = () => {
       },
    });
    const { data, fetching, error } = anime;
+
+   // character states
+   const [charactersPage, setCharactersPage] = useState(1);
+   const [allCharacters, setAllCharacters] = useState<CharacterEdge[]>([]);
+
+   const [characters] = useQuery({
+      query: GetMediaCharactersQuery,
+      variables: {
+         mediaId: Number(id),
+         page: charactersPage,
+      },
+   });
+   const {
+      data: charactersData,
+      fetching: fetchingCharacters,
+      error: charactersError,
+   } = characters;
+
+   useEffect(() => {
+      const nextEdges = (charactersData?.Media?.characters?.edges ?? []).filter(
+         (edge): edge is CharacterEdge => Boolean(edge),
+      );
+
+      if (!nextEdges.length) return;
+
+      setAllCharacters((prev) => [...prev, ...nextEdges]);
+   }, [charactersData]);
+
+   const loadMoreCharacters = () => {
+      if (!fetchingCharacters && charactersData?.Media?.characters?.pageInfo?.hasNextPage) {
+         setCharactersPage((prev) => prev + 1);
+      }
+   };
+
+   if (charactersError) console.error("Error fetching characters data:", charactersError);
 
    if (error) console.error("Error fetching anime data:", error);
 
@@ -228,7 +273,7 @@ const Anime = () => {
                <View>
                   <Text className="mb-2 text-lg font-semibold text-white">Characters</Text>
                   <FlashList
-                     data={data?.Media?.characters?.edges}
+                     data={allCharacters}
                      className="mb-6"
                      horizontal
                      renderItem={({ item }) => (
@@ -239,6 +284,15 @@ const Anime = () => {
                            role={item?.role ?? ""}
                         />
                      )}
+                     onEndReached={loadMoreCharacters}
+                     onEndReachedThreshold={0.5}
+                     ListFooterComponent={
+                        fetchingCharacters ? (
+                           <View className="flex h-[120] w-[40] items-center justify-center">
+                              <ActivityIndicator size="small" />
+                           </View>
+                        ) : null
+                     }
                   />
                </View>
 
