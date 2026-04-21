@@ -1,7 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { Search } from "lucide-react-native";
-import React from "react";
 import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, View } from "react-native";
 import { useQuery } from "urql";
 
@@ -9,9 +8,6 @@ import TrendingMediaCard from "@/components/TrendingMediaCard";
 import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
-import { PopularAnimeInterface } from "@/types/popularAnimeInterface";
-import { TrendingAnimeInterface } from "@/types/trendingAnimeInterface";
-import { TrendingMangaInterface } from "@/types/trendingMangaInterface";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;
@@ -22,14 +18,14 @@ const Index = () => {
       router.push("/search");
    };
    // trending anime
-   const [animeResult] = useQuery<TrendingAnimeInterface["data"]>({
+   const [animeResult] = useQuery({
       query: GetTrendingAnimeQuery,
    });
 
    const { data: animeList, fetching: animeFetching, error: animeError } = animeResult;
 
    // popular anime
-   const [popularAnimeResult] = useQuery<PopularAnimeInterface["data"]>({
+   const [popularAnimeResult] = useQuery({
       query: GetPopularAnimeQuery,
    });
 
@@ -40,7 +36,7 @@ const Index = () => {
    } = popularAnimeResult;
 
    // trending manga
-   const [mangaResult] = useQuery<TrendingMangaInterface["data"]>({
+   const [mangaResult] = useQuery({
       query: GetTrendingMangaQuery,
    });
 
@@ -80,20 +76,21 @@ const Index = () => {
             {animeList && (
                <FlashList
                   style={{ height: 350, width: "100%" }}
-                  data={animeList.Page.media}
+                  data={animeList.Page?.media}
                   renderItem={({ item }) => (
                      <TrendingMediaCard
-                        id={item.id}
+                        id={item?.id ?? 0}
                         mediaType="ANIME"
-                        title={item.title.english}
-                        altTitle={item.title.romaji}
-                        score={item.averageScore}
-                        likes={item.favourites}
-                        coverImage={item.coverImage.large}
-                        bannerImage={item.bannerImage}
-                        description={item.description}
-                        genres={item.genres}
-                        secondText={item.studios.nodes[0]?.name || "Unknown Studio"}
+                        title={item?.title?.english ?? item?.title?.romaji ?? ""}
+                        score={item?.averageScore ?? 0}
+                        likes={item?.favourites ?? 0}
+                        coverImage={item?.coverImage?.large ?? ""}
+                        bannerImage={item?.bannerImage ?? ""}
+                        description={item?.description ?? "No description available"}
+                        genres={(item?.genres ?? []).filter(
+                           (genre): genre is string => genre !== null,
+                        )}
+                        secondText={item?.studios?.nodes?.[0]?.name ?? "Unknown Studio"}
                         cardWidth={CARD_WIDTH}
                      />
                   )}
@@ -108,20 +105,21 @@ const Index = () => {
             {popularAnimeList && (
                <FlashList
                   style={{ height: 350, width: "100%" }}
-                  data={popularAnimeList.Page.media}
+                  data={popularAnimeList?.Page?.media}
                   renderItem={({ item }) => (
                      <TrendingMediaCard
-                        id={item.id}
+                        id={item?.id ?? 0}
                         mediaType="ANIME"
-                        title={item.title.english}
-                        altTitle={item.title.romaji}
-                        score={item.averageScore}
-                        likes={item.favourites}
-                        coverImage={item.coverImage.large}
-                        bannerImage={item.bannerImage}
-                        description={item.description}
-                        genres={item.genres}
-                        secondText={item.studios.nodes[0]?.name || "Unknown Studio"}
+                        title={item?.title?.english ?? item?.title?.romaji ?? ""}
+                        score={item?.averageScore ?? 0}
+                        likes={item?.favourites ?? 0}
+                        coverImage={item?.coverImage?.large ?? ""}
+                        bannerImage={item?.bannerImage ?? ""}
+                        description={item?.description ?? "No description available"}
+                        genres={(item?.genres ?? []).filter(
+                           (genre): genre is string => genre !== null,
+                        )}
+                        secondText={item?.studios?.nodes?.[0]?.name ?? "Unknown Studio"}
                         cardWidth={CARD_WIDTH}
                      />
                   )}
@@ -136,20 +134,21 @@ const Index = () => {
             {mangaList && (
                <FlashList
                   style={{ height: 350, width: "100%" }}
-                  data={mangaList.Page.media}
+                  data={mangaList?.Page?.media}
                   horizontal
                   renderItem={({ item }) => (
                      <TrendingMediaCard
-                        id={item.id}
+                        id={item?.id ?? 0}
                         mediaType="MANGA"
-                        title={item.title.english}
-                        altTitle={item.title.romaji}
-                        score={item.averageScore}
-                        likes={item.favourites}
-                        coverImage={item.coverImage.large}
-                        bannerImage={item.bannerImage}
-                        description={item.description}
-                        genres={item.genres}
+                        title={item?.title?.english ?? item?.title?.romaji ?? ""}
+                        score={item?.averageScore ?? 0}
+                        likes={item?.favourites ?? 0}
+                        coverImage={item?.coverImage?.large ?? ""}
+                        bannerImage={item?.bannerImage ?? ""}
+                        description={item?.description ?? "No description available"}
+                        genres={(item?.genres ?? []).filter(
+                           (genre): genre is string => genre !== null,
+                        )}
                         cardWidth={CARD_WIDTH}
                      />
                   )}
