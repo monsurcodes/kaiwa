@@ -1,6 +1,6 @@
 import { gql } from "@/lib/graphql/generated";
 
-export const GetAnimeByIdQuery = gql(`
+export const GetAnimeByIdQuery = gql(/* GraphQL */ `
    query GetAnimeById($mediaId: Int) {
       Media(id: $mediaId, type: ANIME) {
          id

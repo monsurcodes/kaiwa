@@ -1,6 +1,6 @@
 import { gql } from "@/lib/graphql/generated";
 
-export const GetTrendingMangaQuery = gql(`
+export const GetTrendingMangaQuery = gql(/* GraphQL */ `
    query GetTrendingManga($page: Int = 1) {
       Page(page: $page, perPage: 10) {
          pageInfo {

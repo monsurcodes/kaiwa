@@ -1,6 +1,6 @@
 import { gql } from "@/lib/graphql/generated";
 
-export const GetTrendingAnimeQuery = gql(`
+export const GetTrendingAnimeQuery = gql(/* GraphQL */ `
    query GetTrendingAnime($page: Int = 1) {
       Page(page: $page, perPage: 10) {
          pageInfo {

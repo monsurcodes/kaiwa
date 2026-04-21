@@ -1,6 +1,6 @@
 import { gql } from "@/lib/graphql/generated";
 
-export const GetAuthUserDataQuery = gql(`
+export const GetAuthUserDataQuery = gql(/* GraphQL */ `
    query GetAuthUserData {
       Viewer {
          id
