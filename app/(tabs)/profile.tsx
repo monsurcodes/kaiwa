@@ -1,14 +1,18 @@
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { Settings } from "lucide-react-native";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { useQuery } from "urql";
 
 import FavCard from "@/components/FavCard";
+import FloatingButton from "@/components/FloatingButton";
 import MarkdownText from "@/components/MarkdownText";
 import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
 import { minutesToDays } from "@/lib/utils/date";
 
 const Profile = () => {
+   const router = useRouter();
    const [authUser] = useQuery({
       query: GetAuthUserDataQuery,
    });
@@ -34,7 +38,7 @@ const Profile = () => {
             showsHorizontalScrollIndicator={false}
          >
             {/* banner */}
-            <View className="relative flex w-full items-center">
+            <View className="relative mb-4 flex w-full justify-center">
                {bannerUri ? (
                   <Image
                      source={{ uri: bannerUri }}
@@ -54,12 +58,13 @@ const Profile = () => {
                      source={{ uri: avatarUri }}
                      style={{
                         position: "absolute",
-                        bottom: -80,
                         width: 160,
                         height: 160,
                         borderRadius: 80,
                         borderWidth: 4,
                         borderColor: "#030014",
+                        marginRight: 6,
+                        alignSelf: "flex-end",
                      }}
                      contentFit="cover"
                      cachePolicy="memory-disk"
@@ -68,22 +73,28 @@ const Profile = () => {
                   <View
                      style={{
                         position: "absolute",
-                        bottom: -80,
                         width: 160,
                         height: 160,
                         borderRadius: 80,
                         borderWidth: 4,
                         borderColor: "#030014",
+                        marginRight: 6,
+                        alignSelf: "flex-end",
                      }}
                      className="bg-slate-800"
                   />
                )}
-            </View>
 
-            {/* greeting */}
-            <Text className="mx-auto mb-6 mt-[80px] text-xl font-semibold text-white">
-               {data?.Viewer?.name ?? "User"}
-            </Text>
+               <Text
+                  className="rounded-md bg-slate-900/70 px-2 py-1 text-xl font-semibold text-white"
+                  style={{
+                     position: "absolute",
+                     marginLeft: 10,
+                  }}
+               >
+                  Hello!, {data?.Viewer?.name ?? "User"}
+               </Text>
+            </View>
 
             {/* about */}
             <View className="mb-4">
@@ -254,6 +265,7 @@ const Profile = () => {
                </View>
             )}
          </ScrollView>
+         <FloatingButton Icon={Settings} onPress={() => router.push("/settings")} />
       </View>
    );
 };
