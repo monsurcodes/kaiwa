@@ -45,3 +45,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# ignore mardown snapshot files
+project-snapshot.md
+
+# generated graphql types
+lib/graphql/generated
