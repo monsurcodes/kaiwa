@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { EllipsisVertical, X } from "lucide-react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
    ActivityIndicator,
    LayoutAnimation,
@@ -24,7 +24,6 @@ import TagCard from "@/components/TagCard";
 import TrailerCard from "@/components/TrailerCard";
 import { GetAnimeByIdQuery } from "@/lib/graphql/queries/getAnimeById";
 import { formatAiringDate, getMonth } from "@/lib/utils/date";
-import { AnimeByIdInterface } from "@/types/animeByIdInterface";
 
 const isNewArchitectureEnabled = Boolean(
    (global as typeof globalThis & { nativeFabricUIManager?: unknown }).nativeFabricUIManager,
@@ -68,7 +67,7 @@ const Anime = () => {
    };
 
    const { id } = useLocalSearchParams();
-   const [anime] = useQuery<AnimeByIdInterface["data"]>({
+   const [anime] = useQuery({
       query: GetAnimeByIdQuery,
       variables: {
          mediaId: Number(id),
@@ -78,7 +77,7 @@ const Anime = () => {
 
    if (error) console.error("Error fetching anime data:", error);
 
-   console.log("Fetched anime id:", data?.Media.id);
+   console.log("Fetched anime id:", data?.Media?.id);
 
    if (fetching)
       return (
@@ -109,7 +108,9 @@ const Anime = () => {
             {/* header */}
             <View className="relative h-64">
                <Image
-                  source={{ uri: data.Media.bannerImage || data.Media.coverImage.extraLarge }}
+                  source={{
+                     uri: data?.Media?.bannerImage ?? data?.Media?.coverImage?.extraLarge ?? "",
+                  }}
                   style={{
                      position: "absolute",
                      top: 0,
@@ -131,7 +132,10 @@ const Anime = () => {
                      <View className="shadow-lg">
                         <Image
                            source={{
-                              uri: data.Media.coverImage.extraLarge || data.Media.bannerImage,
+                              uri:
+                                 data?.Media?.coverImage?.extraLarge ??
+                                 data?.Media?.bannerImage ??
+                                 "",
                            }}
                            style={{
                               marginRight: 8,
@@ -145,21 +149,22 @@ const Anime = () => {
                      </View>
                      <View className="flex-1 gap-1 pb-1">
                         <Text className="text-lg font-bold leading-tight text-white">
-                           {data.Media.title.english ||
-                              data.Media.title.romaji ||
-                              data.Media.title.native}
+                           {data?.Media?.title?.english ??
+                              data?.Media?.title?.romaji ??
+                              data?.Media?.title?.native ??
+                              "Title Not Available"}
                         </Text>
 
-                        <Text className="text-xs text-white">{data.Media.startDate.year}</Text>
+                        <Text className="text-xs text-white">{data?.Media?.startDate?.year}</Text>
 
                         <Text className="text-sm font-semibold text-white">
-                           {data.Media.format} • {data.Media.episodes} episodes
+                           {data?.Media?.format} • {data?.Media?.episodes} episodes
                         </Text>
 
-                        {data.Media.nextAiringEpisode && (
+                        {data?.Media?.nextAiringEpisode && (
                            <Text className="mt-2 text-sm text-green-300">
-                              ● EP {data.Media.nextAiringEpisode.episode} on{" "}
-                              {formatAiringDate(data.Media.nextAiringEpisode.airingAt)}{" "}
+                              ● EP {data?.Media?.nextAiringEpisode?.episode} on{" "}
+                              {formatAiringDate(data?.Media?.nextAiringEpisode?.airingAt)}{" "}
                            </Text>
                         )}
                      </View>
@@ -170,28 +175,28 @@ const Anime = () => {
             <View className="flex-1 p-4">
                <View className="mx-auto mb-4 h-16 w-3/4 flex-row items-center justify-around rounded-md bg-slate-900/70 px-2 py-1">
                   <View className="flex items-center gap-2">
-                     <Text className="text-white">{data.Media.averageScore}</Text>
+                     <Text className="text-white">{data?.Media?.averageScore}</Text>
                      <Text className="text-sm font-semibold text-white">Score</Text>
                   </View>
 
                   <View className="h-[30px] w-[1px] bg-gray-400/50" />
 
                   <View className="flex items-center gap-2">
-                     <Text className="text-white">{data.Media.favourites}</Text>
+                     <Text className="text-white">{data?.Media?.favourites}</Text>
                      <Text className="text-sm font-semibold text-white">Favourites</Text>
                   </View>
 
                   <View className="h-[30px] w-[1px] bg-gray-400/50" />
 
                   <View className="flex items-center gap-2">
-                     <Text className="text-white">{data.Media.popularity}</Text>
+                     <Text className="text-white">{data?.Media?.popularity}</Text>
                      <Text className="text-sm font-semibold text-white">Popularity</Text>
                   </View>
                </View>
 
                {/* genres */}
                <FlashList
-                  data={data.Media.genres}
+                  data={data?.Media?.genres}
                   className="mb-4"
                   horizontal
                   renderItem={({ item }) => (
@@ -209,7 +214,7 @@ const Anime = () => {
                      className="rounded-md bg-slate-900/70 px-4 py-2"
                   >
                      <HtmlText
-                        htmlContent={data.Media.description ?? ""}
+                        htmlContent={data?.Media?.description ?? ""}
                         numberOfLines={isExpanded ? undefined : 4}
                      />
 
@@ -223,15 +228,15 @@ const Anime = () => {
                <View>
                   <Text className="mb-2 text-lg font-semibold text-white">Characters</Text>
                   <FlashList
-                     data={data.Media.characters.edges}
+                     data={data?.Media?.characters?.edges}
                      className="mb-6"
                      horizontal
                      renderItem={({ item }) => (
                         <CharacterCard
-                           id={item.node.id}
-                           name={item.node.name.full}
-                           image={item.node.image.large}
-                           role={item.role}
+                           id={item?.node?.id ?? 0}
+                           name={item?.node?.name?.full ?? "Name Unavailable"}
+                           image={item?.node?.image?.large ?? ""}
+                           role={item?.role ?? ""}
                         />
                      )}
                   />
@@ -247,7 +252,7 @@ const Anime = () => {
                            <Text className="text-white">Format</Text>
                         </View>
                         <View className="w-1/2">
-                           <Text className="text-white">{data.Media.format}</Text>
+                           <Text className="text-white">{data?.Media?.format}</Text>
                         </View>
                      </View>
 
@@ -258,7 +263,7 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.episodes ? data.Media.episodes : "?"}
+                              {data?.Media?.episodes ? data?.Media?.episodes : "?"}
                            </Text>
                         </View>
                      </View>
@@ -270,7 +275,7 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.duration ? `${data.Media.duration} minutes` : "?"}
+                              {data?.Media?.duration ? `${data?.Media?.duration} minutes` : "?"}
                            </Text>
                         </View>
                      </View>
@@ -282,7 +287,7 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.source.split("_").join(" ")}
+                              {data?.Media?.source?.split("_").join(" ")}
                            </Text>
                         </View>
                      </View>
@@ -294,7 +299,7 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.status.split("_").join(" ")}
+                              {data?.Media?.status?.split("_").join(" ")}
                            </Text>
                         </View>
                      </View>
@@ -306,8 +311,9 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.startDate.year} {getMonth(data.Media.startDate.month)}{" "}
-                              {data.Media.startDate.day}
+                              {data?.Media?.startDate?.year}{" "}
+                              {getMonth(data?.Media?.startDate?.month ?? 0)}{" "}
+                              {data?.Media?.startDate?.day}
                            </Text>
                         </View>
                      </View>
@@ -319,8 +325,9 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.endDate.year ? data.Media.endDate.year : "?"}{" "}
-                              {getMonth(data.Media.endDate.month)} {data.Media.endDate.day}
+                              {data?.Media?.endDate?.year ? data?.Media?.endDate?.year : "?"}{" "}
+                              {getMonth(data?.Media?.endDate?.month ?? 0)}{" "}
+                              {data?.Media?.endDate?.day}
                            </Text>
                         </View>
                      </View>
@@ -332,7 +339,7 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data.Media.season} {data.Media.startDate.year}
+                              {data?.Media?.season} {data?.Media?.startDate?.year}
                            </Text>
                         </View>
                      </View>
@@ -345,11 +352,21 @@ const Anime = () => {
                            <Text className="text-white">Studio</Text>
                         </View>
                         <View className="w-1/2">
-                           {data.Media.studios.edges
-                              .filter((studio) => studio.isMain)
+                           {(data?.Media?.studios?.edges ?? [])
+                              .filter(
+                                 (
+                                    studio,
+                                 ): studio is NonNullable<
+                                    NonNullable<
+                                       NonNullable<
+                                          NonNullable<typeof data.Media>["studios"]
+                                       >["edges"]
+                                    >[number]
+                                 > => Boolean(studio?.isMain && studio?.node),
+                              )
                               .map((studio) => (
                                  <Text key={studio.id} className="text-white">
-                                    {studio.node.name}
+                                    {studio?.node?.name}
                                  </Text>
                               ))}
                         </View>
@@ -361,11 +378,21 @@ const Anime = () => {
                            <Text className="text-white">Producers</Text>
                         </View>
                         <View className="w-1/2">
-                           {data.Media.studios.edges
-                              .filter((studio) => !studio.node.isAnimationStudio)
+                           {(data?.Media?.studios?.edges ?? [])
+                              .filter(
+                                 (
+                                    studio,
+                                 ): studio is NonNullable<
+                                    NonNullable<
+                                       NonNullable<
+                                          NonNullable<typeof data.Media>["studios"]
+                                       >["edges"]
+                                    >[number]
+                                 > => Boolean(studio?.node && !studio.node.isAnimationStudio),
+                              )
                               .map((studio) => (
                                  <Text key={studio.id} className="text-white">
-                                    {studio.node.name}
+                                    {studio?.node?.name}
                                  </Text>
                               ))}
                         </View>
@@ -377,18 +404,18 @@ const Anime = () => {
                <View>
                   <Text className="mb-2 text-lg font-semibold text-white">Tags</Text>
                   <FlashList
-                     data={data.Media.tags}
+                     data={data?.Media?.tags}
                      className="mb-6"
                      horizontal
-                     keyExtractor={(item) => item.id.toString()}
+                     keyExtractor={(item, index) => item?.id?.toString() ?? `tag-${index}`}
                      renderItem={({ item }) => (
                         <TagCard
-                           id={item.id}
-                           name={item.name}
-                           description={item.description}
-                           rank={item.rank}
-                           spoiler={item.isMediaSpoiler}
-                           isRevealed={revealedTagIds.includes(item.id)}
+                           id={item?.id ?? 0}
+                           name={item?.name ?? "Name Unavailable"}
+                           description={item?.description ?? "Description Unavailable"}
+                           rank={item?.rank ?? 0}
+                           spoiler={item?.isMediaSpoiler ?? false}
+                           isRevealed={revealedTagIds.includes(item?.id ?? 0)}
                            onReveal={handleRevealTag}
                         />
                      )}
@@ -399,42 +426,47 @@ const Anime = () => {
                <View>
                   <Text className="mb-2 text-lg font-semibold text-white">Relations</Text>
                   <FlashList
-                     data={data.Media.relations.edges}
+                     data={data?.Media?.relations?.edges}
                      className="mb-6"
                      horizontal
                      renderItem={({ item }) => (
                         <RelationCard
-                           id={item.node.id}
-                           relationType={item.relationType}
-                           type={item.node.type}
-                           title={item.node.title.english || item.node.title.romaji}
-                           image={item.node.coverImage.large}
+                           id={item?.node?.id ?? 0}
+                           relationType={item?.relationType ?? ""}
+                           type={item?.node?.type ?? ""}
+                           title={
+                              item?.node?.title?.english ??
+                              item?.node?.title?.romaji ??
+                              "Title Unavailable"
+                           }
+                           image={item?.node?.coverImage?.large ?? ""}
                         />
                      )}
                   />
                </View>
 
                {/* youtube trailer */}
-               {data.Media.trailer && data.Media.trailer.site === "youtube" && (
-                  <TrailerCard videoId={data.Media.trailer.id} />
+               {data?.Media?.trailer && data?.Media?.trailer?.site === "youtube" && (
+                  <TrailerCard videoId={data?.Media?.trailer?.id ?? ""} />
                )}
 
                {/* recommendations */}
                <View>
                   <Text className="mb-2 text-lg font-semibold text-white">Recommendations</Text>
                   <FlashList
-                     data={data.Media.recommendations.nodes}
+                     data={data?.Media?.recommendations?.nodes}
                      className="mb-6"
                      horizontal
                      renderItem={({ item }) => (
                         <RecommendationCard
-                           id={item.mediaRecommendation.id}
-                           type={item.mediaRecommendation.type}
+                           id={item?.mediaRecommendation?.id ?? 0}
+                           type={item?.mediaRecommendation?.type ?? ""}
                            title={
-                              item.mediaRecommendation.title.english ||
-                              item.mediaRecommendation.title.romaji
+                              item?.mediaRecommendation?.title?.english ??
+                              item?.mediaRecommendation?.title?.romaji ??
+                              "Title Unavailable"
                            }
-                           image={item.mediaRecommendation.coverImage.large}
+                           image={item?.mediaRecommendation?.coverImage?.large ?? ""}
                         />
                      )}
                   />
