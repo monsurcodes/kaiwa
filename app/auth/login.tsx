@@ -61,9 +61,9 @@ const Login = () => {
          <TouchableOpacity
             disabled={!request}
             onPress={() => promptAsync()}
-            className="rounded-full bg-emerald-500 px-10 py-4 shadow-lg shadow-emerald-500/20"
+            className="rounded-lg bg-[#11212D] px-10 py-4  shadow-lg shadow-emerald-500/20"
          >
-            <Text className="text-lg font-bold text-[#030014]">Login with AniList</Text>
+            <Text className="text-lg font-bold text-white">Login with AniList</Text>
          </TouchableOpacity>
       </View>
    );
