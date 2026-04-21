@@ -1,5 +1,5 @@
 import * as AuthSession from "expo-auth-session";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import { ANILIST_CLIENT_ID, ANILIST_CLIENT_SECRET, ANILIST_REDIRECT_URI } from "@/constants";

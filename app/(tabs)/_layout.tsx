@@ -1,6 +1,5 @@
 import { Tabs } from "expo-router";
 import { BookOpen, Home, MessageSquare, Search, User } from "lucide-react-native";
-import React from "react";
 import { View } from "react-native";
 
 const Layout = () => {

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { View } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 

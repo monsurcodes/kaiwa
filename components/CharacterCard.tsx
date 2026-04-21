@@ -1,5 +1,4 @@
 import { Image } from "expo-image";
-import React from "react";
 import { Pressable, Text, View } from "react-native";
 
 interface CharacterCardProps {

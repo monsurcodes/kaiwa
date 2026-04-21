@@ -1,4 +1,3 @@
-import React from "react";
 import { Linking, useWindowDimensions } from "react-native";
 import RenderHtml from "react-native-render-html";
 
