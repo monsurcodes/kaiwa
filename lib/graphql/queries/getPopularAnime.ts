@@ -1,6 +1,6 @@
-import { gql } from "urql";
+import { gql } from "@/lib/graphql/generated";
 
-export const GetPopularAnimeQuery = gql`
+export const GetPopularAnimeQuery = gql(`
    query GetPopularAnime($page: Int = 1) {
       Page(page: $page, perPage: 10) {
          pageInfo {
@@ -30,4 +30,4 @@ export const GetPopularAnimeQuery = gql`
          }
       }
    }
-`;
+`);

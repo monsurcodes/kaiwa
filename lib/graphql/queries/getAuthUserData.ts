@@ -1,6 +1,6 @@
-import { gql } from "urql";
+import { gql } from "@/lib/graphql/generated";
 
-export const GetAuthUserDataQuery = gql`
+export const GetAuthUserDataQuery = gql(`
    query GetAuthUserData {
       Viewer {
          id
@@ -79,4 +79,4 @@ export const GetAuthUserDataQuery = gql`
          }
       }
    }
-`;
+`);

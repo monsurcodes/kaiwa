@@ -1,6 +1,6 @@
-import { gql } from "urql";
+import { gql } from "@/lib/graphql/generated";
 
-export const GetAnimeByIdQuery = gql`
+export const GetAnimeByIdQuery = gql(`
    query GetAnimeById($mediaId: Int) {
       Media(id: $mediaId, type: ANIME) {
          id
@@ -111,4 +111,4 @@ export const GetAnimeByIdQuery = gql`
          }
       }
    }
-`;
+`);
