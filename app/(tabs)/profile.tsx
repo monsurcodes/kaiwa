@@ -2,6 +2,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Settings } from "lucide-react-native";
+import { useEffect } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { useQuery } from "urql";
 
@@ -10,20 +11,32 @@ import FloatingButton from "@/components/FloatingButton";
 import MarkdownText from "@/components/MarkdownText";
 import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
 import { minutesToDays } from "@/lib/utils/date";
+import { useDataStore } from "@/stores/useDataStore";
 
 const Profile = () => {
    const router = useRouter();
+   const { userProfile, setUserProfile } = useDataStore();
+
    const [authUser] = useQuery({
       query: GetAuthUserDataQuery,
+      pause: Boolean(userProfile),
    });
 
    const { data, fetching, error } = authUser;
-   const bannerUri = (data?.Viewer?.bannerImage ?? "").trim();
-   const avatarUri = (data?.Viewer?.avatar?.large ?? "").trim();
+   const profileData = userProfile ?? data?.Viewer;
+
+   useEffect(() => {
+      if (!userProfile && data?.Viewer) {
+         setUserProfile(data.Viewer);
+      }
+   }, [data?.Viewer, setUserProfile, userProfile]);
+
+   const bannerUri = (profileData?.bannerImage ?? "").trim();
+   const avatarUri = (profileData?.avatar?.large ?? "").trim();
 
    if (error) console.error("Error fetching authenticated user data:", error);
 
-   if (fetching)
+   if (!profileData && fetching)
       return (
          <View className="flex-1 items-center justify-center">
             <ActivityIndicator size={30} />
@@ -92,14 +105,14 @@ const Profile = () => {
                      marginLeft: 10,
                   }}
                >
-                  Hello!, {data?.Viewer?.name ?? "User"}
+                  Hello!, {profileData?.name ?? "User"}
                </Text>
             </View>
 
             {/* about */}
             <View className="mb-4">
                <Text className="text-lg font-semibold text-white">About</Text>
-               <MarkdownText content={data?.Viewer?.about ?? ""} />
+               <MarkdownText content={profileData?.about ?? ""} />
             </View>
 
             {/* stats */}
@@ -110,7 +123,7 @@ const Profile = () => {
                   <View className="flex-row">
                      <Text className="w-1/2 text-white">Total Anime</Text>
                      <Text className="w-1/2 text-white">
-                        {data?.Viewer?.statistics?.anime?.count ?? 0}
+                        {profileData?.statistics?.anime?.count ?? 0}
                      </Text>
                   </View>
 
@@ -118,7 +131,7 @@ const Profile = () => {
                   <View className="flex-row">
                      <Text className="w-1/2 text-white">Episodes Watched</Text>
                      <Text className="w-1/2 text-white">
-                        {data?.Viewer?.statistics?.anime?.episodesWatched ?? 0}
+                        {profileData?.statistics?.anime?.episodesWatched ?? 0}
                      </Text>
                   </View>
 
@@ -126,7 +139,7 @@ const Profile = () => {
                   <View className="flex-row">
                      <Text className="w-1/2 text-white">Days Watched</Text>
                      <Text className="w-1/2 text-white">
-                        {minutesToDays(data?.Viewer?.statistics?.anime?.minutesWatched ?? 0)}
+                        {minutesToDays(profileData?.statistics?.anime?.minutesWatched ?? 0)}
                      </Text>
                   </View>
 
@@ -134,7 +147,7 @@ const Profile = () => {
                   <View className="flex-row">
                      <Text className="w-1/2 text-white">Anime Mean Score</Text>
                      <Text className="w-1/2 text-white">
-                        {data?.Viewer?.statistics?.anime?.meanScore ?? 0}
+                        {profileData?.statistics?.anime?.meanScore ?? 0}
                      </Text>
                   </View>
 
@@ -142,7 +155,7 @@ const Profile = () => {
                   <View className="flex-row">
                      <Text className="w-1/2 text-white">Total Manga</Text>
                      <Text className="w-1/2 text-white">
-                        {data?.Viewer?.statistics?.manga?.count ?? 0}
+                        {profileData?.statistics?.manga?.count ?? 0}
                      </Text>
                   </View>
 
@@ -150,7 +163,7 @@ const Profile = () => {
                   <View className="flex-row">
                      <Text className="w-1/2 text-white">Chapters Read</Text>
                      <Text className="w-1/2 text-white">
-                        {data?.Viewer?.statistics?.manga?.chaptersRead ?? 0}
+                        {profileData?.statistics?.manga?.chaptersRead ?? 0}
                      </Text>
                   </View>
 
@@ -158,18 +171,18 @@ const Profile = () => {
                   <View className="flex-row">
                      <Text className="w-1/2 text-white">Manga Mean Score</Text>
                      <Text className="w-1/2 text-white">
-                        {data?.Viewer?.statistics?.manga?.meanScore ?? 0}
+                        {profileData?.statistics?.manga?.meanScore ?? 0}
                      </Text>
                   </View>
                </View>
             </View>
 
             {/* fav anime */}
-            {(data?.Viewer?.favourites?.anime?.nodes?.length ?? 0) > 0 && (
+            {(profileData?.favourites?.anime?.nodes?.length ?? 0) > 0 && (
                <View className="mb-4">
                   <Text className="mb-2 text-lg font-semibold text-white">Favorite Anime</Text>
                   <FlashList
-                     data={data?.Viewer?.favourites?.anime?.nodes}
+                     data={profileData?.favourites?.anime?.nodes}
                      renderItem={({ item }) => (
                         <FavCard
                            id={item?.id ?? 0}
@@ -187,11 +200,11 @@ const Profile = () => {
             )}
 
             {/* fav manga */}
-            {(data?.Viewer?.favourites?.manga?.nodes?.length ?? 0) > 0 && (
+            {(profileData?.favourites?.manga?.nodes?.length ?? 0) > 0 && (
                <View className="mb-4">
                   <Text className="mb-2 text-lg font-semibold text-white">Favorite manga</Text>
                   <FlashList
-                     data={data?.Viewer?.favourites?.manga?.nodes}
+                     data={profileData?.favourites?.manga?.nodes}
                      renderItem={({ item }) => (
                         <FavCard
                            id={item?.id ?? 0}
@@ -209,11 +222,11 @@ const Profile = () => {
             )}
 
             {/* fav characters */}
-            {(data?.Viewer?.favourites?.characters?.nodes?.length ?? 0) > 0 && (
+            {(profileData?.favourites?.characters?.nodes?.length ?? 0) > 0 && (
                <View className="mb-4">
                   <Text className="mb-2 text-lg font-semibold text-white">Favorite Characters</Text>
                   <FlashList
-                     data={data?.Viewer?.favourites?.characters?.nodes}
+                     data={profileData?.favourites?.characters?.nodes}
                      renderItem={({ item }) => (
                         <FavCard
                            id={item?.id ?? 0}
@@ -229,11 +242,11 @@ const Profile = () => {
             )}
 
             {/* fav staff */}
-            {(data?.Viewer?.favourites?.staff?.nodes?.length ?? 0) > 0 && (
+            {(profileData?.favourites?.staff?.nodes?.length ?? 0) > 0 && (
                <View className="mb-4">
                   <Text className="mb-2 text-lg font-semibold text-white">Favorite Staff</Text>
                   <FlashList
-                     data={data?.Viewer?.favourites?.staff?.nodes}
+                     data={profileData?.favourites?.staff?.nodes}
                      renderItem={({ item }) => (
                         <FavCard
                            id={item?.id ?? 0}
@@ -249,11 +262,11 @@ const Profile = () => {
             )}
 
             {/* fav studios */}
-            {(data?.Viewer?.favourites?.studios?.nodes?.length ?? 0) > 0 && (
+            {(profileData?.favourites?.studios?.nodes?.length ?? 0) > 0 && (
                <View className="mb-4">
                   <Text className="mb-2 text-lg font-semibold text-white">Favorite Studios</Text>
                   <FlashList
-                     data={data?.Viewer?.favourites?.studios?.nodes}
+                     data={profileData?.favourites?.studios?.nodes}
                      renderItem={({ item }) => (
                         <Text className="mr-3 rounded-md bg-slate-900/70 px-3 py-2 font-bold text-white">
                            {item?.name ?? "Name Unavailable"}
