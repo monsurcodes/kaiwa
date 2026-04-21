@@ -14,6 +14,17 @@ A feature-rich mobile application for AniList users to browse, search, and track
 - **Beautiful UI** - Dark mode optimized, smooth animations, and responsive design
 - **OAuth Integration** - Seamless AniList authentication
 
+## 📥 Download
+
+Download the latest APK build directly on your Android device:
+
+[**⬇️ Download Latest APK**](https://github.com/monsurcodes/kaiwa/releases/latest)
+
+- Go to [Releases](https://github.com/monsurcodes/kaiwa/releases)
+- Download the latest `.apk` file
+- Open the file on your Android device and tap Install
+- Grant necessary permissions when prompted
+
 ## 🏗️ Tech Stack
 
 - **Framework**: [React Native](https://reactnative.dev/) with [Expo](https://expo.dev/)
@@ -40,7 +51,7 @@ A feature-rich mobile application for AniList users to browse, search, and track
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/kaiwa.git
+git clone https://github.com/monsurcodes/kaiwa.git
 cd kaiwa
 ```
 
