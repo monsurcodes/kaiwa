@@ -6,7 +6,7 @@ export default function AuthCallback() {
 
    return (
       <View style={{ flex: 1, backgroundColor: "#030014", justifyContent: "center" }}>
-         <ActivityIndicator color="#10b981" />
+         <ActivityIndicator size={30} />
       </View>
    );
 }
