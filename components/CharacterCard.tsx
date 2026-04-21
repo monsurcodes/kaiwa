@@ -12,10 +12,7 @@ const CharacterCard = ({ id, name, image, role }: CharacterCardProps) => {
    const imageUri = (image || "").trim();
 
    return (
-      <Pressable
-         className="mr-3 h-[170] w-[95] overflow-hidden"
-         onPress={() => console.log(`Character ID: ${id}`)}
-      >
+      <Pressable className="mr-3 h-[170] w-[95] overflow-hidden" onPress={() => {}}>
          {imageUri ? (
             <Image
                source={{ uri: imageUri }}

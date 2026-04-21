@@ -18,11 +18,8 @@ const FavCard = ({ id, title, image, type }: FavCardProps) => {
       } else if (type === "manga") {
          router.push(`/manga/${id}`);
       } else if (type === "character") {
-         console.log("Character card pressed with id:", id);
       } else if (type === "staff") {
-         console.log("Staff card pressed with id:", id);
       } else if (type === "studio") {
-         console.log("Studio card pressed with id:", id);
       }
    };
 

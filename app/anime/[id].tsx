@@ -57,7 +57,6 @@ const Anime = () => {
 
    const handleOptionPress = () => {
       // Implement option button logic, e.g., show action sheet
-      console.log("Option button pressed");
    };
 
    // synopsis expand/collapse
@@ -121,8 +120,6 @@ const Anime = () => {
    if (charactersError) console.error("Error fetching characters data:", charactersError);
 
    if (error) console.error("Error fetching anime data:", error);
-
-   console.log("Fetched anime id:", data?.Media?.id);
 
    if (fetching)
       return (
