@@ -400,7 +400,7 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data?.Media?.startDate?.year}{" "}
+                              {data?.Media?.startDate?.year ? data?.Media?.startDate?.year : "?"}{" "}
                               {getMonth(data?.Media?.startDate?.month ?? 0)}{" "}
                               {data?.Media?.startDate?.day}
                            </Text>
@@ -428,7 +428,8 @@ const Anime = () => {
                         </View>
                         <View className="w-1/2">
                            <Text className="text-white">
-                              {data?.Media?.season} {data?.Media?.startDate?.year}
+                              {data?.Media?.season ? data?.Media?.season : "?"}{" "}
+                              {data?.Media?.startDate?.year}
                            </Text>
                         </View>
                      </View>
@@ -436,103 +437,113 @@ const Anime = () => {
 
                   <View className="mb-6 gap-2 rounded-md bg-slate-900/70 px-4 py-2">
                      {/* studio */}
-                     <View className="flex-row">
-                        <View className="w-1/2">
-                           <Text className="text-white">Studio</Text>
-                        </View>
-                        <View className="w-1/2">
-                           {(data?.Media?.studios?.edges ?? [])
-                              .filter(
-                                 (
-                                    studio,
-                                 ): studio is NonNullable<
-                                    NonNullable<
+                     {data?.Media?.studios?.edges?.some((studio) => studio?.isMain) && (
+                        <View className="flex-row">
+                           <View className="w-1/2">
+                              <Text className="text-white">Studio</Text>
+                           </View>
+                           <View className="w-1/2">
+                              {(data?.Media?.studios?.edges ?? [])
+                                 .filter(
+                                    (
+                                       studio,
+                                    ): studio is NonNullable<
                                        NonNullable<
-                                          NonNullable<typeof data.Media>["studios"]
-                                       >["edges"]
-                                    >[number]
-                                 > => Boolean(studio?.isMain && studio?.node),
-                              )
-                              .map((studio) => (
-                                 <Text key={studio.id} className="text-white">
-                                    {studio?.node?.name}
-                                 </Text>
-                              ))}
+                                          NonNullable<
+                                             NonNullable<typeof data.Media>["studios"]
+                                          >["edges"]
+                                       >[number]
+                                    > => Boolean(studio?.isMain && studio?.node),
+                                 )
+                                 .map((studio) => (
+                                    <Text key={studio.id} className="text-white">
+                                       {studio?.node?.name}
+                                    </Text>
+                                 ))}
+                           </View>
                         </View>
-                     </View>
+                     )}
 
                      {/* producers */}
-                     <View className="flex-row">
-                        <View className="w-1/2">
-                           <Text className="text-white">Producers</Text>
-                        </View>
-                        <View className="w-1/2">
-                           {(data?.Media?.studios?.edges ?? [])
-                              .filter(
-                                 (
-                                    studio,
-                                 ): studio is NonNullable<
-                                    NonNullable<
+                     {data?.Media?.studios?.edges?.some(
+                        (studio) => !studio?.node?.isAnimationStudio,
+                     ) && (
+                        <View className="flex-row">
+                           <View className="w-1/2">
+                              <Text className="text-white">Producers</Text>
+                           </View>
+                           <View className="w-1/2">
+                              {(data?.Media?.studios?.edges ?? [])
+                                 .filter(
+                                    (
+                                       studio,
+                                    ): studio is NonNullable<
                                        NonNullable<
-                                          NonNullable<typeof data.Media>["studios"]
-                                       >["edges"]
-                                    >[number]
-                                 > => Boolean(studio?.node && !studio.node.isAnimationStudio),
-                              )
-                              .map((studio) => (
-                                 <Text key={studio.id} className="text-white">
-                                    {studio?.node?.name}
-                                 </Text>
-                              ))}
+                                          NonNullable<
+                                             NonNullable<typeof data.Media>["studios"]
+                                          >["edges"]
+                                       >[number]
+                                    > => Boolean(studio?.node && !studio.node.isAnimationStudio),
+                                 )
+                                 .map((studio) => (
+                                    <Text key={studio.id} className="text-white">
+                                       {studio?.node?.name}
+                                    </Text>
+                                 ))}
+                           </View>
                         </View>
-                     </View>
+                     )}
                   </View>
                </View>
 
                {/* tags */}
-               <View>
-                  <Text className="mb-2 text-lg font-semibold text-white">Tags</Text>
-                  <FlashList
-                     data={data?.Media?.tags}
-                     className="mb-6"
-                     horizontal
-                     keyExtractor={(item, index) => item?.id?.toString() ?? `tag-${index}`}
-                     renderItem={({ item }) => (
-                        <TagCard
-                           id={item?.id ?? 0}
-                           name={item?.name ?? "Name Unavailable"}
-                           description={item?.description ?? "Description Unavailable"}
-                           rank={item?.rank ?? 0}
-                           spoiler={item?.isMediaSpoiler ?? false}
-                           isRevealed={revealedTagIds.includes(item?.id ?? 0)}
-                           onReveal={handleRevealTag}
-                        />
-                     )}
-                  />
-               </View>
+               {data?.Media?.tags && data.Media.tags.length > 0 && (
+                  <View>
+                     <Text className="mb-2 text-lg font-semibold text-white">Tags</Text>
+                     <FlashList
+                        data={data?.Media?.tags}
+                        className="mb-6"
+                        horizontal
+                        keyExtractor={(item, index) => item?.id?.toString() ?? `tag-${index}`}
+                        renderItem={({ item }) => (
+                           <TagCard
+                              id={item?.id ?? 0}
+                              name={item?.name ?? "Name Unavailable"}
+                              description={item?.description ?? "Description Unavailable"}
+                              rank={item?.rank ?? 0}
+                              spoiler={item?.isMediaSpoiler ?? false}
+                              isRevealed={revealedTagIds.includes(item?.id ?? 0)}
+                              onReveal={handleRevealTag}
+                           />
+                        )}
+                     />
+                  </View>
+               )}
 
                {/* relations */}
-               <View>
-                  <Text className="mb-2 text-lg font-semibold text-white">Relations</Text>
-                  <FlashList
-                     data={data?.Media?.relations?.edges}
-                     className="mb-6"
-                     horizontal
-                     renderItem={({ item }) => (
-                        <RelationCard
-                           id={item?.node?.id ?? 0}
-                           relationType={item?.relationType ?? ""}
-                           type={item?.node?.type ?? ""}
-                           title={
-                              item?.node?.title?.english ??
-                              item?.node?.title?.romaji ??
-                              "Title Unavailable"
-                           }
-                           image={item?.node?.coverImage?.large ?? ""}
-                        />
-                     )}
-                  />
-               </View>
+               {data?.Media?.relations?.edges && data?.Media?.relations?.edges.length > 0 && (
+                  <View>
+                     <Text className="mb-2 text-lg font-semibold text-white">Relations</Text>
+                     <FlashList
+                        data={data?.Media?.relations?.edges}
+                        className="mb-6"
+                        horizontal
+                        renderItem={({ item }) => (
+                           <RelationCard
+                              id={item?.node?.id ?? 0}
+                              relationType={item?.relationType ?? ""}
+                              type={item?.node?.format ?? ""}
+                              title={
+                                 item?.node?.title?.english ??
+                                 item?.node?.title?.romaji ??
+                                 "Title Unavailable"
+                              }
+                              image={item?.node?.coverImage?.large ?? ""}
+                           />
+                        )}
+                     />
+                  </View>
+               )}
 
                {/* youtube trailer */}
                {data?.Media?.trailer && data?.Media?.trailer?.site === "youtube" && (
@@ -540,26 +551,31 @@ const Anime = () => {
                )}
 
                {/* recommendations */}
-               <View>
-                  <Text className="mb-2 text-lg font-semibold text-white">Recommendations</Text>
-                  <FlashList
-                     data={data?.Media?.recommendations?.nodes}
-                     className="mb-6"
-                     horizontal
-                     renderItem={({ item }) => (
-                        <RecommendationCard
-                           id={item?.mediaRecommendation?.id ?? 0}
-                           type={item?.mediaRecommendation?.type ?? ""}
-                           title={
-                              item?.mediaRecommendation?.title?.english ??
-                              item?.mediaRecommendation?.title?.romaji ??
-                              "Title Unavailable"
-                           }
-                           image={item?.mediaRecommendation?.coverImage?.large ?? ""}
+               {data?.Media?.recommendations?.nodes &&
+                  data?.Media?.recommendations?.nodes.length > 0 && (
+                     <View>
+                        <Text className="mb-2 text-lg font-semibold text-white">
+                           Recommendations
+                        </Text>
+                        <FlashList
+                           data={data?.Media?.recommendations?.nodes}
+                           className="mb-6"
+                           horizontal
+                           renderItem={({ item }) => (
+                              <RecommendationCard
+                                 id={item?.mediaRecommendation?.id ?? 0}
+                                 type={item?.mediaRecommendation?.type ?? ""}
+                                 title={
+                                    item?.mediaRecommendation?.title?.english ??
+                                    item?.mediaRecommendation?.title?.romaji ??
+                                    "Title Unavailable"
+                                 }
+                                 image={item?.mediaRecommendation?.coverImage?.large ?? ""}
+                              />
+                           )}
                         />
-                     )}
-                  />
-               </View>
+                     </View>
+                  )}
 
                <View className="mb-20"></View>
             </View>
