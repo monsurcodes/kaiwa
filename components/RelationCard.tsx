@@ -32,7 +32,9 @@ const RelationCard = ({ id, relationType, type, title, image }: RelationCardProp
                source={{ uri: imageUri }}
                style={{ width: 150, height: 200, borderRadius: 8 }}
                contentFit="cover"
-               cachePolicy="memory-disk"
+               cachePolicy="disk"
+               transition={100}
+               recyclingKey={id.toString()}
             />
          ) : (
             <View className="h-[200] w-[150] rounded-lg bg-slate-800" />

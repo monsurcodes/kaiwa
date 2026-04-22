@@ -64,7 +64,9 @@ const TrendingMediaCard = ({
                      height: "100%",
                   }}
                   contentFit="cover"
-                  cachePolicy="memory-disk"
+                  cachePolicy="disk"
+                  transition={100}
+                  recyclingKey={`banner-${id}`}
                />
             ) : (
                <View className="absolute inset-0 bg-slate-800" />
@@ -86,7 +88,9 @@ const TrendingMediaCard = ({
                               borderRadius: 6,
                            }}
                            contentFit="cover"
-                           cachePolicy="memory-disk"
+                           cachePolicy="disk"
+                           transition={100}
+                           recyclingKey={`poster-${id}`}
                         />
                      ) : (
                         <View className="mr-2 h-40 w-28 rounded-md bg-slate-800" />

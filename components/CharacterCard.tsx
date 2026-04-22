@@ -18,7 +18,9 @@ const CharacterCard = ({ id, name, image, role }: CharacterCardProps) => {
                source={{ uri: imageUri }}
                style={{ width: 95, height: 120, borderRadius: 6 }}
                contentFit="cover"
-               cachePolicy="memory-disk"
+               cachePolicy="disk"
+               transition={100}
+               recyclingKey={id.toString()}
             />
          ) : (
             <View className="h-[120] w-[95] rounded-md bg-slate-800" />
