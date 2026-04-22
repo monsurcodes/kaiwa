@@ -1,8 +1,8 @@
 import { gql } from "@/lib/graphql/generated";
 
-export const GetAnimeByIdQuery = gql(/* GraphQL */ `
-   query GetAnimeById($mediaId: Int) {
-      Media(id: $mediaId, type: ANIME) {
+export const GetMangaByIdQuery = gql(/* GraphQL */ `
+   query GetMangaById($mediaId: Int) {
+      Media(id: $mediaId, type: MANGA) {
          id
          title {
             english
@@ -18,10 +18,8 @@ export const GetAnimeByIdQuery = gql(/* GraphQL */ `
          favourites
          popularity
          format
-         episodes
-         duration
+         chapters
          genres
-         season
          source
          status
          trailer {
@@ -38,18 +36,6 @@ export const GetAnimeByIdQuery = gql(/* GraphQL */ `
             day
             month
             year
-         }
-         studios {
-            edges {
-               id
-               isMain
-               node {
-                  id
-                  name
-                  isAnimationStudio
-                  siteUrl
-               }
-            }
          }
          relations {
             edges {
@@ -68,11 +54,6 @@ export const GetAnimeByIdQuery = gql(/* GraphQL */ `
                   format
                }
             }
-         }
-         nextAiringEpisode {
-            episode
-            airingAt
-            timeUntilAiring
          }
          tags {
             id

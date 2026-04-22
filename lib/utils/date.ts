@@ -16,32 +16,9 @@ export const minutesToDays = (minutes: number) => {
 };
 
 export const getMonth = (month: number): string => {
-   switch (month) {
-      case 1:
-         return "Jan";
-      case 2:
-         return "Feb";
-      case 3:
-         return "Mar";
-      case 4:
-         return "Apr";
-      case 5:
-         return "May";
-      case 6:
-         return "Jun";
-      case 7:
-         return "Jul";
-      case 8:
-         return "Aug";
-      case 9:
-         return "Sep";
-      case 10:
-         return "Oct";
-      case 11:
-         return "Nov";
-      case 12:
-         return "Dec";
-      default:
-         return "";
-   }
+   if (month < 1 || month > 12) return "";
+
+   return new Intl.DateTimeFormat("en-US", { month: "short" })
+      .format(new Date(Date.UTC(2026, month - 1, 1)))
+      .toUpperCase();
 };

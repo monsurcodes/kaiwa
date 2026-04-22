@@ -2,6 +2,8 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
+// TODO: add likes and averageScore to the card UI.
+
 interface RecommendationCardProps {
    id: number;
    type: string;
@@ -31,7 +33,9 @@ const RecommendationCard = ({ id, type, title, image }: RecommendationCardProps)
                source={{ uri: imageUri }}
                style={{ width: 150, height: 200, borderRadius: 6 }}
                contentFit="cover"
-               cachePolicy="memory-disk"
+               cachePolicy="disk"
+               transition={100}
+               recyclingKey={id.toString()}
             />
          ) : (
             <View className="h-[200] w-[150] rounded-md bg-slate-800" />
