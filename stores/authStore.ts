@@ -1,13 +1,18 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import type { GetAuthUserDataQuery } from "@/lib/graphql/generated/graphql";
 import { storage } from "@/lib/storage/mmkv";
+
+type UserProfile = NonNullable<GetAuthUserDataQuery["Viewer"]>;
 
 interface AuthState {
    token: string | null;
    expiresAt: number | null;
+   userProfile: UserProfile | null;
    isLoggedIn: boolean;
    setToken: (token: string, expiresAt: number) => void;
+   setUserProfile: (data: UserProfile) => void;
    logout: () => void;
 }
 
@@ -23,22 +28,24 @@ export const useAuthStore = create<AuthState>()(
       (set) => ({
          token: null,
          expiresAt: null,
-         user: null,
+         userProfile: null,
          isLoggedIn: false,
 
-         setToken: (token, expiresAt) => set({ token, expiresAt, isLoggedIn: true }),
+         setToken: (token, expiresAt) => {
+            storage.remove("auth-storage");
+            set({ token, expiresAt, isLoggedIn: true });
+         },
 
-         logout: () => set({ token: null, expiresAt: null, isLoggedIn: false }),
+         setUserProfile: (data) => set({ userProfile: data }),
+
+         logout: () => {
+            set({ token: null, expiresAt: null, isLoggedIn: false, userProfile: null });
+            storage.remove("auth-storage");
+         },
       }),
       {
-         name: "auth-storage", // The master key in MMKV
+         name: "auth-storage",
          storage: createJSONStorage(() => mmkvStorage),
-         // Optional: Only persist specific fields
-         partialize: (state) => ({
-            token: state.token,
-            expiresAt: state.expiresAt,
-            isLoggedIn: state.isLoggedIn,
-         }),
       },
    ),
 );

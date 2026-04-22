@@ -25,11 +25,13 @@
    },
    "dependencies": {
       "@expo/vector-icons": "^15.0.3",
+      "@react-native-community/netinfo": "11.4.1",
       "@react-navigation/bottom-tabs": "^7.4.0",
       "@react-navigation/elements": "^2.6.3",
       "@react-navigation/native": "^7.1.8",
       "@shopify/flash-list": "2.0.2",
       "@urql/exchange-auth": "^3.0.0",
+      "@urql/exchange-retry": "^2.0.0",
       "expo": "~54.0.33",
       "expo-auth-session": "~7.0.10",
       "expo-constants": "~18.0.13",

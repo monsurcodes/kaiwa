@@ -32,7 +32,9 @@ const FavCard = ({ id, title, image, type }: FavCardProps) => {
             source={{ uri: image }}
             style={{ width: 150, height: 200, borderRadius: 8 }}
             contentFit="cover"
-            cachePolicy="memory-disk"
+            cachePolicy="disk"
+            transition={100}
+            recyclingKey={id.toString()}
          />
          <Text className="px-2 py-1 text-white" numberOfLines={2}>
             {title}

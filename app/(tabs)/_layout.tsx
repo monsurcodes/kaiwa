@@ -4,7 +4,7 @@ import { View } from "react-native";
 
 const TabBarIcon = ({ Icon, isFocused }: { Icon: LucideIcon; isFocused: boolean }) => {
    return (
-      <View className="p-45 mt-2 size-full items-center justify-center rounded-full">
+      <View className="mt-2 size-full items-center justify-center rounded-full p-4">
          <Icon size={24} color={isFocused ? "white" : "#9ca3af"} />
       </View>
    );
