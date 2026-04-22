@@ -86,8 +86,16 @@ const Index = () => {
 
    if (shouldShowLoading)
       return (
-         <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size={30} />
+         <View className="flex-1 gap-3">
+            <Pressable onPress={handleSearchPress} className="mt-2 rounded-md bg-slate-900/70 p-4">
+               <View className="flex-row items-center">
+                  <Search color="white" size={20} />
+                  <Text className="ml-2 text-xl text-gray-400/70">What are you looking for?</Text>
+               </View>
+            </Pressable>
+            <View className="flex items-center justify-center">
+               <ActivityIndicator size={30} />
+            </View>
          </View>
       );
 
@@ -96,20 +104,20 @@ const Index = () => {
    const trendingMangaData = trendingManga ?? mangaList?.Page?.media;
 
    return (
-      <View className="flex-1">
+      <View className="flex-1 gap-3">
+         {/* search bar */}
+         <Pressable onPress={handleSearchPress} className="mt-2 rounded-md bg-slate-900/70 p-4">
+            <View className="flex-row items-center">
+               <Search color="white" size={20} />
+               <Text className="ml-2 text-xl text-gray-400/70">What are you looking for?</Text>
+            </View>
+         </Pressable>
+
          <ScrollView
             className="flex-1"
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
          >
-            {/* search bar */}
-            <Pressable onPress={handleSearchPress} className="mt-2 rounded-md bg-slate-900/70 p-4">
-               <View className="flex-row items-center">
-                  <Search color="white" size={20} />
-                  <Text className="ml-2 text-xl text-gray-400/70">What are you looking for?</Text>
-               </View>
-            </Pressable>
-
             {/* Trending Anime */}
             {trendingAnimeData && (
                <Text className="mb-2 mt-6 text-xl font-semibold text-white">Trending Anime</Text>
