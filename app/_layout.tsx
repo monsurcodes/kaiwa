@@ -185,7 +185,10 @@ export default function RootLayout() {
                         name="anime/[id]"
                         options={{ headerShown: false, animation: "slide_from_right" }}
                      />
-                     <Stack.Screen name="manga/[id]" options={{ headerShown: false }} />
+                     <Stack.Screen
+                        name="manga/[id]"
+                        options={{ headerShown: false, animation: "slide_from_right" }}
+                     />
                      <Stack.Screen name="auth/login" options={{ headerShown: false }} />
                      <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
                      <Stack.Screen
