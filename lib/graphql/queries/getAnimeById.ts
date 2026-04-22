@@ -65,6 +65,7 @@ export const GetAnimeByIdQuery = gql(/* GraphQL */ `
                      large
                   }
                   type
+                  format
                }
             }
          }
@@ -94,6 +95,16 @@ export const GetAnimeByIdQuery = gql(/* GraphQL */ `
                   }
                }
             }
+         }
+         externalLinks {
+            color
+            icon
+            id
+            site
+            siteId
+            type
+            url
+            language
          }
       }
    }
