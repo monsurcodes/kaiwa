@@ -163,7 +163,8 @@ const Anime = () => {
                      height: "100%",
                   }}
                   contentFit="cover"
-                  cachePolicy="memory-disk"
+                  cachePolicy="disk"
+                  transition={100}
                />
 
                <LinearGradient
@@ -186,7 +187,8 @@ const Anime = () => {
                               borderRadius: 6,
                            }}
                            contentFit="cover"
-                           cachePolicy="memory-disk"
+                           cachePolicy="disk"
+                           transition={100}
                         />
                      </View>
                      <View className="flex-1 gap-1 pb-1">
