@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { EllipsisVertical, X } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
    ActivityIndicator,
    LayoutAnimation,
@@ -51,6 +51,7 @@ const Anime = () => {
    const [revealedTagIds, setRevealedTagIds] = useState<number[]>([]);
 
    // close button and option button handlers
+   // TODO: Takes more time to close the screen than direct back button navigation. Optimize by using a custom animation or using native navigation pop if possible.
    const handleScreenClose = () => {
       router.replace("/(tabs)");
    };
@@ -74,13 +75,19 @@ const Anime = () => {
    };
 
    // data fetching
-   const { id } = useLocalSearchParams();
+   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
+   const mediaId = useMemo(() => {
+      const rawId = Array.isArray(id) ? id[0] : id;
+      const parsedId = Number(rawId);
+      return Number.isFinite(parsedId) ? parsedId : null;
+   }, [id]);
 
    const [anime] = useQuery({
       query: GetAnimeByIdQuery,
       variables: {
-         mediaId: Number(id),
+         mediaId: mediaId ?? 0,
       },
+      pause: mediaId === null,
    });
    const { data, fetching, error } = anime;
 
@@ -91,9 +98,10 @@ const Anime = () => {
    const [characters] = useQuery({
       query: GetMediaCharactersQuery,
       variables: {
-         mediaId: Number(id),
+         mediaId: mediaId ?? 0,
          page: charactersPage,
       },
+      pause: mediaId === null,
    });
    const {
       data: charactersData,
@@ -102,14 +110,37 @@ const Anime = () => {
    } = characters;
 
    useEffect(() => {
+      // Route param changes can reuse this screen instance; reset pagination + list for new media.
+      setCharactersPage(1);
+      setAllCharacters([]);
+   }, [mediaId]);
+
+   useEffect(() => {
       const nextEdges = (charactersData?.Media?.characters?.edges ?? []).filter(
          (edge): edge is CharacterEdge => Boolean(edge),
       );
 
+      if (charactersPage === 1) {
+         setAllCharacters(nextEdges);
+         return;
+      }
+
       if (!nextEdges.length) return;
 
-      setAllCharacters((prev) => [...prev, ...nextEdges]);
-   }, [charactersData]);
+      setAllCharacters((prev) => {
+         const existingIds = new Set(prev.map((edge) => edge.node?.id));
+         const merged = [...prev];
+
+         for (const edge of nextEdges) {
+            const characterId = edge.node?.id;
+            if (existingIds.has(characterId)) continue;
+            existingIds.add(characterId);
+            merged.push(edge);
+         }
+
+         return merged;
+      });
+   }, [charactersData, charactersPage]);
 
    const loadMoreCharacters = () => {
       if (!fetchingCharacters && charactersData?.Media?.characters?.pageInfo?.hasNextPage) {
@@ -272,9 +303,14 @@ const Anime = () => {
                <View>
                   <Text className="mb-2 text-lg font-semibold text-white">Characters</Text>
                   <FlashList
+                     key={`characters-${mediaId ?? "unknown"}`}
                      data={allCharacters}
                      className="mb-6"
+                     style={{ height: 185 }}
                      horizontal
+                     keyExtractor={(item, index) =>
+                        item.node?.id ? item.node.id.toString() : `character-${index}`
+                     }
                      renderItem={({ item }) => (
                         <CharacterCard
                            id={item?.node?.id ?? 0}
