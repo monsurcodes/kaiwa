@@ -1,18 +1,60 @@
+import NetInfo from "@react-native-community/netinfo";
 import { authExchange } from "@urql/exchange-auth";
-import { cacheExchange, Client, fetchExchange } from "urql";
+import { retryExchange } from "@urql/exchange-retry";
+import { cacheExchange, Client, errorExchange, type Exchange, fetchExchange } from "urql";
+import { fromPromise, mergeMap, pipe } from "wonka";
 
 import { ANILIST_API_URL } from "@/constants";
 import { useAuthStore } from "@/stores/authStore";
+
+// Utility to wait for connection
+const waitForConnection = () => {
+   return new Promise<void>((resolve) => {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+         if (state.isConnected && state.isInternetReachable) {
+            unsubscribe();
+            resolve();
+         }
+      });
+   });
+};
+
+// Custom exchange to pause operations when offline
+const offlineExchange: Exchange =
+   ({ forward }) =>
+   (ops$) => {
+      return forward(
+         pipe(
+            ops$,
+            mergeMap((operation) => {
+               return fromPromise(
+                  NetInfo.fetch().then(async (state) => {
+                     if (!state.isConnected || !state.isInternetReachable) {
+                        console.log(`[Network] Offline. Pausing ${operation.kind}...`);
+                        await waitForConnection();
+                     }
+                     return operation;
+                  }),
+               );
+            }),
+         ),
+      );
+   };
 
 export const client = new Client({
    url: ANILIST_API_URL,
    preferGetMethod: false,
    exchanges: [
+      offlineExchange,
       cacheExchange,
+      retryExchange({
+         initialDelayMs: 1000,
+         maxNumberAttempts: 3,
+         retryIf: (error, _operation) => Boolean(error.networkError),
+      }),
       authExchange(async (utils) => {
          return {
             addAuthToOperation(operation) {
-               // Access the token directly from the Zustand store state
                const token = useAuthStore.getState().token;
 
                if (!token) return operation;
@@ -43,6 +85,13 @@ export const client = new Client({
                return false;
             },
          };
+      }),
+      errorExchange({
+         onError(error) {
+            if (error.networkError) {
+               console.log("[Network Error]: Check your connection.", error.networkError);
+            }
+         },
       }),
       fetchExchange,
    ],
