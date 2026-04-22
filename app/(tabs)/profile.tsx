@@ -11,25 +11,27 @@ import FloatingButton from "@/components/FloatingButton";
 import MarkdownText from "@/components/MarkdownText";
 import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
 import { minutesToDays } from "@/lib/utils/date";
-import { useDataStore } from "@/stores/useDataStore";
+import { useAuthStore } from "@/stores/authStore";
 
 const Profile = () => {
    const router = useRouter();
-   const { userProfile, setUserProfile } = useDataStore();
+   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+   const { userProfile, setUserProfile } = useAuthStore();
 
    const [authUser] = useQuery({
       query: GetAuthUserDataQuery,
-      pause: Boolean(userProfile),
+      pause: !isLoggedIn || Boolean(userProfile),
+      requestPolicy: "network-only",
    });
 
    const { data, fetching, error } = authUser;
    const profileData = userProfile ?? data?.Viewer;
 
    useEffect(() => {
-      if (!userProfile && data?.Viewer) {
+      if (isLoggedIn && !userProfile && data?.Viewer) {
          setUserProfile(data.Viewer);
       }
-   }, [data?.Viewer, setUserProfile, userProfile]);
+   }, [data?.Viewer, isLoggedIn, setUserProfile, userProfile]);
 
    const bannerUri = (profileData?.bannerImage ?? "").trim();
    const avatarUri = (profileData?.avatar?.large ?? "").trim();
@@ -57,7 +59,8 @@ const Profile = () => {
                      source={{ uri: bannerUri }}
                      style={{ width: "100%", height: 208, borderRadius: 8 }}
                      contentFit="cover"
-                     cachePolicy="memory-disk"
+                     cachePolicy="disk"
+                     transition={100}
                   />
                ) : (
                   <View
@@ -80,7 +83,8 @@ const Profile = () => {
                         alignSelf: "flex-end",
                      }}
                      contentFit="cover"
-                     cachePolicy="memory-disk"
+                     cachePolicy="disk"
+                     transition={100}
                   />
                ) : (
                   <View
@@ -110,10 +114,12 @@ const Profile = () => {
             </View>
 
             {/* about */}
-            <View className="mb-4">
-               <Text className="text-lg font-semibold text-white">About</Text>
-               <MarkdownText content={profileData?.about ?? ""} />
-            </View>
+            {profileData?.about && (
+               <View className="mb-4">
+                  <Text className="text-lg font-semibold text-white">About</Text>
+                  <MarkdownText content={profileData?.about ?? ""} />
+               </View>
+            )}
 
             {/* stats */}
             <View className="mb-4">
