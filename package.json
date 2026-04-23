@@ -1,7 +1,7 @@
 {
    "name": "kaiwa",
    "main": "expo-router/entry",
-   "version": "0.1.0",
+   "version": "0.2.1",
    "scripts": {
       "start": "expo start",
       "android": "expo run:android",
@@ -12,7 +12,8 @@
       "lint": "expo lint",
       "lint:fix": "expo lint --fix",
       "prepare": "husky",
-      "codegen": "graphql-codegen --config codegen.ts"
+      "codegen": "graphql-codegen --config codegen.ts",
+      "eas-build-post-install": "npm run codegen"
    },
    "lint-staged": {
       ".{ts,tsx,js,jsx}": [
