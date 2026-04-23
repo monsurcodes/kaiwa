@@ -2,7 +2,7 @@
    "expo": {
       "name": "Kaiwa",
       "slug": "kaiwa",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "orientation": "portrait",
       "icon": "./assets/images/icon.png",
       "scheme": "kaiwa",
@@ -39,6 +39,12 @@
       "experiments": {
          "typedRoutes": true,
          "reactCompiler": true
+      },
+      "extra": {
+         "router": {},
+         "eas": {
+            "projectId": "2a5e18f1-8566-4020-a59b-50e4efe76001"
+         }
       }
    }
 }
