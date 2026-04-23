@@ -4,7 +4,9 @@ import { Image } from "expo-image";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import * as Updates from "expo-updates";
 import { useEffect, useState } from "react";
+import { Alert } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Provider } from "urql";
@@ -165,6 +167,29 @@ export default function RootLayout() {
          router.replace("/(tabs)");
       }
    }, [isLoggedIn, segments, isReady, router]);
+
+   useEffect(() => {
+      async function onFetchUpdateAsync() {
+         try {
+            const update = await Updates.checkForUpdateAsync();
+
+            if (update.isAvailable) {
+               await Updates.fetchUpdateAsync();
+
+               Alert.alert("Update Available", "A new version of Kaiwa is ready. Restart now?", [
+                  { text: "Later" },
+                  { text: "Restart", onPress: () => Updates.reloadAsync() },
+               ]);
+            }
+         } catch (error) {
+            console.warn(`Error fetching update: ${error}`);
+         }
+      }
+
+      if (!__DEV__) {
+         onFetchUpdateAsync();
+      }
+   }, []);
 
    return (
       <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#030014" }}>

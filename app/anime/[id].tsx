@@ -532,7 +532,8 @@ const Anime = () => {
                            <RelationCard
                               id={item?.node?.id ?? 0}
                               relationType={item?.relationType ?? ""}
-                              type={item?.node?.format ?? ""}
+                              type={item?.node?.type ?? ""}
+                              format={item?.node?.format ?? ""}
                               title={
                                  item?.node?.title?.english ??
                                  item?.node?.title?.romaji ??
