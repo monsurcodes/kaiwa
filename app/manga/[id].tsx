@@ -293,36 +293,38 @@ const Manga = () => {
                </View>
 
                {/* characters */}
-               <View>
-                  <Text className="mb-2 text-lg font-semibold text-white">Characters</Text>
-                  <FlashList
-                     key={`characters-${mediaId ?? "unknown"}`}
-                     data={allCharacters}
-                     className="mb-6"
-                     style={{ height: 185 }}
-                     horizontal
-                     keyExtractor={(item, index) =>
-                        item.node?.id ? item.node.id.toString() : `character-${index}`
-                     }
-                     renderItem={({ item }) => (
-                        <CharacterCard
-                           id={item?.node?.id ?? 0}
-                           name={item?.node?.name?.full ?? "Name Unavailable"}
-                           image={item?.node?.image?.large ?? ""}
-                           role={item?.role ?? ""}
-                        />
-                     )}
-                     onEndReached={loadMoreCharacters}
-                     onEndReachedThreshold={0.5}
-                     ListFooterComponent={
-                        fetchingCharacters ? (
-                           <View className="flex h-[120] w-[40] items-center justify-center">
-                              <ActivityIndicator size="small" />
-                           </View>
-                        ) : null
-                     }
-                  />
-               </View>
+               {allCharacters && allCharacters.length > 0 && (
+                  <View>
+                     <Text className="mb-2 text-lg font-semibold text-white">Characters</Text>
+                     <FlashList
+                        key={`characters-${mediaId ?? "unknown"}`}
+                        data={allCharacters}
+                        className="mb-6"
+                        style={{ height: 185 }}
+                        horizontal
+                        keyExtractor={(item, index) =>
+                           item.node?.id ? item.node.id.toString() : `character-${index}`
+                        }
+                        renderItem={({ item }) => (
+                           <CharacterCard
+                              id={item?.node?.id ?? 0}
+                              name={item?.node?.name?.full ?? "Name Unavailable"}
+                              image={item?.node?.image?.large ?? ""}
+                              role={item?.role ?? ""}
+                           />
+                        )}
+                        onEndReached={loadMoreCharacters}
+                        onEndReachedThreshold={0.5}
+                        ListFooterComponent={
+                           fetchingCharacters ? (
+                              <View className="flex h-[120] w-[40] items-center justify-center">
+                                 <ActivityIndicator size="small" />
+                              </View>
+                           ) : null
+                        }
+                     />
+                  </View>
+               )}
 
                {/* Info */}
                <View className="">
