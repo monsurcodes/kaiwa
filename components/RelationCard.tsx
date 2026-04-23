@@ -6,11 +6,12 @@ interface RelationCardProps {
    id: number;
    relationType: string;
    type: string;
+   format: string;
    title: string;
    image: string;
 }
 
-const RelationCard = ({ id, relationType, type, title, image }: RelationCardProps) => {
+const RelationCard = ({ id, relationType, type, format, title, image }: RelationCardProps) => {
    const router = useRouter();
    const imageUri = (image || "").trim();
 
@@ -40,7 +41,7 @@ const RelationCard = ({ id, relationType, type, title, image }: RelationCardProp
             <View className="h-[200] w-[150] rounded-lg bg-slate-800" />
          )}
          <Text className="absolute left-2 top-2 rounded-sm bg-slate-900/70 px-1 text-[11px] font-medium text-white">
-            {type}
+            {format.split("_").join(" ")}
          </Text>
          <View className="flex-1 items-center px-2">
             <Text className="mt-1 text-white" numberOfLines={2}>

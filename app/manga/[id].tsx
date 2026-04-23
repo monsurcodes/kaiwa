@@ -150,7 +150,7 @@ const Manga = () => {
 
    if (charactersError) console.error("Error fetching characters data:", charactersError);
 
-   if (error) console.error("Error fetching anime data:", error);
+   if (error) console.error("Error fetching manga data:", error);
 
    if (fetching)
       return (
@@ -456,7 +456,8 @@ const Manga = () => {
                            <RelationCard
                               id={item?.node?.id ?? 0}
                               relationType={item?.relationType ?? ""}
-                              type={item?.node?.format ?? ""}
+                              type={item?.node?.type ?? ""}
+                              format={item?.node?.format ?? ""}
                               title={
                                  item?.node?.title?.english ??
                                  item?.node?.title?.romaji ??
