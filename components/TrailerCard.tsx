@@ -32,7 +32,6 @@ const TrailerCard = ({ videoId }: TrailerCardProps) => {
                allowsFullscreenVideo: true,
             }}
             onError={(error: any) => {
-               console.warn("YouTube Player Error:", error);
                setVideoError(true);
             }}
          />
