@@ -57,11 +57,8 @@ export default function RootLayout() {
       };
 
       if (!useAuthStore.getState().isLoggedIn) {
-         console.warn("[SWR] Revalidation skipped: user is logged out.");
          return;
       }
-
-      console.log("[SWR] Revalidation started: fetching latest app data.");
 
       const { setTrendingAnime, setPopularAnime, setTrendingManga } = useDataStore.getState();
 
@@ -76,7 +73,6 @@ export default function RootLayout() {
          ]);
 
       if (!useAuthStore.getState().isLoggedIn) {
-         console.warn("[SWR] Revalidation discarded: user logged out during fetch.");
          return;
       }
 
@@ -99,8 +95,6 @@ export default function RootLayout() {
          setUserProfile(userProfileResult.data.Viewer);
          preloadUserProfileImages(userProfileResult.data.Viewer);
       }
-
-      console.log("[SWR] Revalidation completed: cache updated with fresh data.");
    };
 
    useEffect(() => {
@@ -109,7 +103,6 @@ export default function RootLayout() {
       const preload = async () => {
          try {
             if (!isLoggedIn) {
-               console.log("[SWR] User is not logged in: skipping preload and revalidation.");
                if (isMounted) setIsReady(true);
                return;
             }
@@ -123,7 +116,6 @@ export default function RootLayout() {
             );
 
             if (hasCachedData) {
-               console.log("[SWR] Cache hit on app start: rendering cached data immediately.");
                if (isMounted) setIsReady(true);
 
                void refreshCachedData().catch((error) => {
@@ -133,7 +125,6 @@ export default function RootLayout() {
                return;
             }
 
-            console.log("[SWR] Cache miss on app start: fetching data before rendering.");
             await refreshCachedData();
          } catch (error) {
             console.error("[SWR] Startup preload failed:", error);
@@ -152,7 +143,6 @@ export default function RootLayout() {
    useEffect(() => {
       if (!isReady) return;
 
-      console.log("[SWR] App is ready: hiding splash screen.");
       SplashScreen.hideAsync();
    }, [isReady]);
 
