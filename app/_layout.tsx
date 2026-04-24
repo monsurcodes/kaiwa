@@ -24,7 +24,7 @@ import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
 import { useAuthStore } from "@/stores/authStore";
-import { useDataStore } from "@/stores/useDataStore";
+import { useDataStore } from "@/stores/dataStore";
 
 void SplashScreen.preventAutoHideAsync();
 
