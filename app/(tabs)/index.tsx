@@ -9,7 +9,7 @@ import TrendingMediaCard from "@/components/TrendingMediaCard";
 import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
-import { useDataStore } from "@/stores/useDataStore";
+import { useDataStore } from "@/stores/dataStore";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;
