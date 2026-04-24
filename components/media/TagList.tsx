@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 
 import { SharedMedia } from "@/types";
 
-import TagCard from "../TagCard";
+import TagCard from "./Cards/TagCard";
 
 interface TagListProps {
    media: SharedMedia | null | undefined;
