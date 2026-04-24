@@ -40,9 +40,11 @@ const RelationCard = ({ id, relationType, type, format, title, image }: Relation
          ) : (
             <View className="h-[200] w-[150] rounded-lg bg-slate-800" />
          )}
-         <Text className="absolute left-2 top-2 rounded-sm bg-slate-900/70 px-1 text-[11px] font-medium text-white">
-            {format.split("_").join(" ")}
-         </Text>
+         {format && (
+            <Text className="absolute left-2 top-2 rounded-md bg-slate-900/70 px-2 py-1 text-[11px] font-medium text-white">
+               {format.split("_").join(" ")}
+            </Text>
+         )}
          <View className="flex-1 items-center px-2">
             <Text className="mt-2 text-center text-white" numberOfLines={2}>
                {title}
