@@ -26,10 +26,10 @@ const CharacterCard = ({ id, name, image, role }: CharacterCardProps) => {
             <View className="h-[120] w-[95] rounded-md bg-slate-800" />
          )}
          <View className="flex-1 px-2 py-1">
-            <Text className="text-[13px] font-medium text-white" numberOfLines={2}>
+            <Text className="text-center text-[13px] font-medium text-white" numberOfLines={2}>
                {name}
             </Text>
-            <Text className="text-[10px] font-medium text-gray-400">{role}</Text>
+            <Text className="text-center text-[10px] font-medium text-gray-400">{role}</Text>
          </View>
       </Pressable>
    );

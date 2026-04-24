@@ -2,11 +2,13 @@ import { useCallback, useState } from "react";
 import { View } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 
+import { SharedMedia } from "@/types";
+
 interface TrailerCardProps {
-   videoId: string;
+   media: SharedMedia | null | undefined;
 }
 
-const TrailerCard = ({ videoId }: TrailerCardProps) => {
+const TrailerCard = ({ media }: TrailerCardProps) => {
    const [playing, setPlaying] = useState(false);
 
    const onStateChange = useCallback((state: string) => {
@@ -17,22 +19,20 @@ const TrailerCard = ({ videoId }: TrailerCardProps) => {
 
    const [videoError, setVideoError] = useState(false);
 
-   if (!videoId || videoError) {
-      return null;
-   }
+   if (!media?.trailer || media.trailer.site !== "youtube" || !media.trailer.id || videoError)
+      return;
 
    return (
-      <View className="mb-8 w-full bg-slate-900">
+      <View className="mb-2 w-full bg-slate-900">
          <YoutubePlayer
             height={220}
             play={playing}
-            videoId={videoId}
+            videoId={media.trailer.id}
             onChangeState={onStateChange}
             webViewProps={{
                allowsFullscreenVideo: true,
             }}
             onError={(error: any) => {
-               console.warn("YouTube Player Error:", error);
                setVideoError(true);
             }}
          />

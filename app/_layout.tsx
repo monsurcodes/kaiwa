@@ -4,13 +4,12 @@ import { Image } from "expo-image";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import * as Updates from "expo-updates";
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Provider } from "urql";
 
+import { theme } from "@/constants/theme";
 import { client } from "@/lib/graphql/client";
 import type {
    GetAuthUserDataQuery as GetAuthUserDataQueryData,
@@ -23,7 +22,7 @@ import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
 import { useAuthStore } from "@/stores/authStore";
-import { useDataStore } from "@/stores/useDataStore";
+import { useDataStore } from "@/stores/dataStore";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -57,11 +56,8 @@ export default function RootLayout() {
       };
 
       if (!useAuthStore.getState().isLoggedIn) {
-         console.warn("[SWR] Revalidation skipped: user is logged out.");
          return;
       }
-
-      console.log("[SWR] Revalidation started: fetching latest app data.");
 
       const { setTrendingAnime, setPopularAnime, setTrendingManga } = useDataStore.getState();
 
@@ -76,7 +72,6 @@ export default function RootLayout() {
          ]);
 
       if (!useAuthStore.getState().isLoggedIn) {
-         console.warn("[SWR] Revalidation discarded: user logged out during fetch.");
          return;
       }
 
@@ -99,8 +94,6 @@ export default function RootLayout() {
          setUserProfile(userProfileResult.data.Viewer);
          preloadUserProfileImages(userProfileResult.data.Viewer);
       }
-
-      console.log("[SWR] Revalidation completed: cache updated with fresh data.");
    };
 
    useEffect(() => {
@@ -109,7 +102,6 @@ export default function RootLayout() {
       const preload = async () => {
          try {
             if (!isLoggedIn) {
-               console.log("[SWR] User is not logged in: skipping preload and revalidation.");
                if (isMounted) setIsReady(true);
                return;
             }
@@ -123,7 +115,6 @@ export default function RootLayout() {
             );
 
             if (hasCachedData) {
-               console.log("[SWR] Cache hit on app start: rendering cached data immediately.");
                if (isMounted) setIsReady(true);
 
                void refreshCachedData().catch((error) => {
@@ -133,7 +124,6 @@ export default function RootLayout() {
                return;
             }
 
-            console.log("[SWR] Cache miss on app start: fetching data before rendering.");
             await refreshCachedData();
          } catch (error) {
             console.error("[SWR] Startup preload failed:", error);
@@ -152,7 +142,6 @@ export default function RootLayout() {
    useEffect(() => {
       if (!isReady) return;
 
-      console.log("[SWR] App is ready: hiding splash screen.");
       SplashScreen.hideAsync();
    }, [isReady]);
 
@@ -168,39 +157,16 @@ export default function RootLayout() {
       }
    }, [isLoggedIn, segments, isReady, router]);
 
-   useEffect(() => {
-      async function onFetchUpdateAsync() {
-         try {
-            const update = await Updates.checkForUpdateAsync();
-
-            if (update.isAvailable) {
-               await Updates.fetchUpdateAsync();
-
-               Alert.alert("Update Available", "A new version of Kaiwa is ready. Restart now?", [
-                  { text: "Later" },
-                  { text: "Restart", onPress: () => Updates.reloadAsync() },
-               ]);
-            }
-         } catch (error) {
-            console.warn(`Error fetching update: ${error}`);
-         }
-      }
-
-      if (!__DEV__) {
-         onFetchUpdateAsync();
-      }
-   }, []);
-
    return (
-      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#030014" }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: theme.bg.base }}>
          <SafeAreaProvider>
             <Provider value={client}>
                <StatusBar style="light" />
-               <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: "#030014" }}>
+               <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: theme.bg.base }}>
                   <Stack
                      screenOptions={{
                         contentStyle: {
-                           backgroundColor: "#030014",
+                           backgroundColor: theme.bg.base,
                         },
                         animation: "slide_from_left",
                      }}

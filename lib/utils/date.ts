@@ -1,4 +1,6 @@
-export const formatAiringDate = (timestamp: number) => {
+export const formatAiringDate = (timestamp: number | null) => {
+   if (!timestamp) return;
+
    return new Intl.DateTimeFormat("en-GB", {
       weekday: "short",
       day: "numeric",

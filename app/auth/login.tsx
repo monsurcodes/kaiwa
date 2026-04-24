@@ -5,6 +5,8 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { ANILIST_CLIENT_ID, ANILIST_CLIENT_SECRET, ANILIST_REDIRECT_URI } from "@/constants";
 import { useAuthStore } from "@/stores/authStore";
 
+// TODO: Switch to implicit flow to avoid exposing client secret in the app bundle //gitignore
+
 const Login = () => {
    const setToken = useAuthStore((state) => state.setToken);
 

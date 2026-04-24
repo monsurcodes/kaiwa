@@ -6,8 +6,8 @@ As **kaiwa** is currently in its initial alpha phase, only the most recent devel
 
 | Version | Supported |
 | ------- | --------- |
-| 0.1.x   | ✅        |
-| < 0.1   | ❌        |
+| 0.3.0   | ✅        |
+| < 3.0   | ❌        |
 
 ## Reporting a Vulnerability
 
