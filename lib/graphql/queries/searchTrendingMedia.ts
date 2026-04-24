@@ -2,7 +2,7 @@ import { gql } from "@/lib/graphql/generated";
 
 export const SearchTrendingMediaQuery = gql(/* GraphQL */ `
    query SearchTrendingMedia($type: MediaType, $page: Int) {
-      Page(perPage: 50, page: $page) {
+      Page(perPage: 10, page: $page) {
          media(sort: POPULARITY_DESC, type: $type) {
             id
             title {
