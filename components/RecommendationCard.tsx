@@ -41,7 +41,7 @@ const RecommendationCard = ({ id, type, title, image }: RecommendationCardProps)
             <View className="h-[200] w-[150] rounded-md bg-slate-800" />
          )}
          <View className="mt-1 px-2 py-1">
-            <Text className="text-white" numberOfLines={2}>
+            <Text className="text-center text-white" numberOfLines={2}>
                {title}
             </Text>
          </View>
