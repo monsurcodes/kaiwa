@@ -30,7 +30,6 @@ const offlineExchange: Exchange =
                return fromPromise(
                   NetInfo.fetch().then(async (state) => {
                      if (!state.isConnected || !state.isInternetReachable) {
-                        console.log(`[Network] Offline. Pausing ${operation.kind}...`);
                         await waitForConnection();
                      }
                      return operation;
@@ -89,7 +88,6 @@ export const client = new Client({
       errorExchange({
          onError(error) {
             if (error.networkError) {
-               console.log("[Network Error]: Check your connection.", error.networkError);
             }
          },
       }),

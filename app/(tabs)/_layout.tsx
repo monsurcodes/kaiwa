@@ -2,10 +2,12 @@ import { Tabs } from "expo-router";
 import { BookOpen, Home, type LucideIcon, MessageSquare, Search, User } from "lucide-react-native";
 import { View } from "react-native";
 
+import { theme } from "@/constants/theme";
+
 const TabBarIcon = ({ Icon, isFocused }: { Icon: LucideIcon; isFocused: boolean }) => {
    return (
       <View className="mt-2 size-full items-center justify-center rounded-full p-4">
-         <Icon size={24} color={isFocused ? "white" : "#9ca3af"} />
+         <Icon size={24} color={isFocused ? theme.tab.iconActive : theme.tab.iconInactive} />
       </View>
    );
 };
@@ -15,7 +17,7 @@ const Layout = () => {
       <Tabs
          screenOptions={{
             sceneStyle: {
-               backgroundColor: "#030014",
+               backgroundColor: theme.bg.base,
                paddingHorizontal: 10,
             },
             tabBarItemStyle: {
@@ -24,8 +26,8 @@ const Layout = () => {
                justifyContent: "center",
                alignItems: "center",
             },
-            tabBarActiveTintColor: "#ffffff",
-            tabBarInactiveTintColor: "#9ca3af",
+            tabBarActiveTintColor: theme.tab.iconActive,
+            tabBarInactiveTintColor: theme.tab.iconInactive,
             tabBarLabelStyle: {
                fontSize: 12,
                marginTop: 4,
@@ -34,7 +36,7 @@ const Layout = () => {
                justifyContent: "center",
                alignItems: "center",
                height: 65,
-               backgroundColor: "#0f0D23",
+               backgroundColor: theme.tab.bg,
                borderTopWidth: 0, // removes the white line at the top of the tab bar
                paddingHorizontal: 10,
             },

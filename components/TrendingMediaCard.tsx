@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { Heart, Star } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
-import HtmlText from "./HtmlText";
+import HtmlText from "./ui/HtmlText";
 
 interface TrendingMediaCardProps {
    mediaType: "ANIME" | "MANGA";

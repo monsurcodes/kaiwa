@@ -9,7 +9,7 @@ import TrendingMediaCard from "@/components/TrendingMediaCard";
 import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
-import { useDataStore } from "@/stores/useDataStore";
+import { useDataStore } from "@/stores/dataStore";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;
@@ -144,6 +144,7 @@ const Index = () => {
                      />
                   )}
                   horizontal
+                  showsHorizontalScrollIndicator={false}
                ></FlashList>
             )}
 
@@ -173,6 +174,7 @@ const Index = () => {
                      />
                   )}
                   horizontal
+                  showsHorizontalScrollIndicator={false}
                ></FlashList>
             )}
 
@@ -185,6 +187,7 @@ const Index = () => {
                   style={{ height: 350, width: "100%" }}
                   data={trendingMangaData}
                   horizontal
+                  showsHorizontalScrollIndicator={false}
                   renderItem={({ item }) => (
                      <TrendingMediaCard
                         id={item?.id ?? 0}
