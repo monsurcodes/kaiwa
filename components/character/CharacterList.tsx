@@ -4,7 +4,7 @@ import { CombinedError } from "urql";
 
 import { CharacterEdge } from "@/types";
 
-import CharacterCard from "../CharacterCard";
+import CharacterCard from "./CharacterCard";
 
 interface CharacterListProps {
    mediaId: number | null;
