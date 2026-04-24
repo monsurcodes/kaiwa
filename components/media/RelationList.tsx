@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 
 import { SharedMedia } from "@/types";
 
-import RelationCard from "../RelationCard";
+import RelationCard from "./Cards/RelationCard";
 
 interface RelationListProps {
    media: SharedMedia | null | undefined;
