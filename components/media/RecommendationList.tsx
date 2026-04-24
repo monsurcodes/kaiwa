@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 
 import { SharedMedia } from "@/types";
 
-import RecommendationCard from "../RecommendationCard";
+import RecommendationCard from "./Cards/RecommendationCard";
 
 interface RecommendationListProps {
    media: SharedMedia | null | undefined;
