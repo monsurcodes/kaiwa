@@ -44,10 +44,10 @@ const RelationCard = ({ id, relationType, type, format, title, image }: Relation
             {format.split("_").join(" ")}
          </Text>
          <View className="flex-1 items-center px-2">
-            <Text className="mt-1 text-white" numberOfLines={2}>
+            <Text className="mt-2 text-center text-white" numberOfLines={2}>
                {title}
             </Text>
-            <Text className="mt-2 text-sm text-gray-400">{relationType.split("_").join(" ")}</Text>
+            <Text className="mt-1 text-sm text-gray-400">{relationType.split("_").join(" ")}</Text>
          </View>
       </Pressable>
    );
