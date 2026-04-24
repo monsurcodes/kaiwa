@@ -7,8 +7,8 @@ import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { useQuery } from "urql";
 
 import FavCard from "@/components/FavCard";
-import FloatingButton from "@/components/FloatingButton";
-import MarkdownText from "@/components/MarkdownText";
+import FloatingButton from "@/components/ui/FloatingButton";
+import MarkdownText from "@/components/ui/MarkdownText";
 import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
 import { minutesToDays } from "@/lib/utils/date";
 import { useAuthStore } from "@/stores/authStore";
@@ -201,6 +201,7 @@ const Profile = () => {
                      )}
                      keyExtractor={(item, index) => item?.id?.toString() ?? `anime-${index}`}
                      horizontal
+                     showsHorizontalScrollIndicator={false}
                   />
                </View>
             )}
@@ -223,6 +224,7 @@ const Profile = () => {
                      )}
                      keyExtractor={(item, index) => item?.id?.toString() ?? `manga-${index}`}
                      horizontal
+                     showsHorizontalScrollIndicator={false}
                   />
                </View>
             )}
@@ -243,6 +245,7 @@ const Profile = () => {
                      )}
                      keyExtractor={(item, index) => item?.id?.toString() ?? `character-${index}`}
                      horizontal
+                     showsHorizontalScrollIndicator={false}
                   />
                </View>
             )}
@@ -263,6 +266,7 @@ const Profile = () => {
                      )}
                      keyExtractor={(item, index) => item?.id?.toString() ?? `staff-${index}`}
                      horizontal
+                     showsHorizontalScrollIndicator={false}
                   />
                </View>
             )}
@@ -280,6 +284,7 @@ const Profile = () => {
                      )}
                      keyExtractor={(item, index) => item?.id?.toString() ?? `studio-${index}`}
                      horizontal
+                     showsHorizontalScrollIndicator={false}
                   />
                </View>
             )}

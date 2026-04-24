@@ -141,6 +141,7 @@ const SearchScreen = () => {
                onEndReachedThreshold={0.5}
                keyboardDismissMode="on-drag"
                keyboardShouldPersistTaps="handled"
+               showsVerticalScrollIndicator={false}
                ListEmptyComponent={
                   !isFetching && isSearching ? (
                      <Text className="mt-10 text-center text-gray-400">No results found.</Text>
