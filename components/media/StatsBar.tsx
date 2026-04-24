@@ -10,7 +10,7 @@ const StatsBar = ({ media }: StatsBarProps) => {
    return (
       <View className="mx-auto h-16 w-3/4 flex-row items-center justify-around rounded-b-md bg-slate-900/70 px-2 py-1">
          <View className="flex items-center gap-2">
-            <Text className="text-white">{media?.averageScore}</Text>
+            <Text className="text-white">{media?.averageScore ?? 0}</Text>
             <Text className="text-sm font-semibold text-white">Score</Text>
          </View>
 
