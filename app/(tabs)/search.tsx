@@ -110,25 +110,21 @@ const SearchScreen = () => {
 
    return (
       <View className="w-full flex-1">
-         <View className="mt-2 flex-row items-center justify-between rounded-md bg-slate-900/70 px-4 py-2">
-            <View className="flex-1 flex-row items-center">
-               <Search color="white" size={20} />
+         <View className="mt-2 flex-row items-center gap-2">
+            <View className="flex-1 flex-row items-center rounded-md bg-slate-900/70 px-4 py-2">
+               <Search color="#94a3b8" size={18} />
                <TextInput
-                  className="ml-2 flex-1 text-xl text-white"
                   placeholder={searchPlaceholderText}
+                  placeholderTextColor="#64748b"
+                  className="ml-2 flex-1 text-base text-white"
                   value={searchQuery}
                   onChangeText={handleSearchChange}
-                  autoFocus={true}
-                  clearButtonMode="while-editing"
                />
             </View>
 
-            <Pressable
-               onPress={toggleMediaType}
-               className="ml-2 rounded-md bg-primary/70 px-3 py-1.5"
-            >
-               <Text className="text-[10px] font-semibold text-white">
-                  SWITCH TO {nextMediaType}
+            <Pressable onPress={toggleMediaType} className="rounded-md bg-accent px-4 py-3">
+               <Text className="text-xs font-black text-white">
+                  {nextMediaType === MediaType.Anime ? "ANIME" : "MANGA"}
                </Text>
             </Pressable>
          </View>

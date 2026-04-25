@@ -11,18 +11,21 @@ import { Provider } from "urql";
 
 import { theme } from "@/constants/theme";
 import { client } from "@/lib/graphql/client";
-import type {
-   GetAuthUserDataQuery as GetAuthUserDataQueryData,
-   GetPopularAnimeQuery as GetPopularAnimeQueryData,
-   GetTrendingAnimeQuery as GetTrendingAnimeQueryData,
-   GetTrendingMangaQuery as GetTrendingMangaQueryData,
+import {
+   type GetAuthUserDataQuery as GetAuthUserDataQueryData,
+   type GetPopularAnimeQuery as GetPopularAnimeQueryData,
+   type GetTrendingAnimeQuery as GetTrendingAnimeQueryData,
+   type GetTrendingMangaQuery as GetTrendingMangaQueryData,
+   MediaType,
 } from "@/lib/graphql/generated/graphql";
 import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
 import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
+import { GetUserLibraryQuery } from "@/lib/graphql/queries/getUserLibrary";
 import { useAuthStore } from "@/stores/authStore";
 import { useDataStore } from "@/stores/dataStore";
+import { UserLibraryLists } from "@/types";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -55,13 +58,22 @@ export default function RootLayout() {
          Image.prefetch(urls);
       };
 
+      const preloadUserLibraryImages = (lists: UserLibraryLists) => {
+         const urls = lists
+            .flatMap((list) => list?.entries)
+            .map((entry) => entry?.media?.coverImage?.large)
+            .filter(isString);
+         Image.prefetch(urls);
+      };
+
       if (!useAuthStore.getState().isLoggedIn) {
          return;
       }
 
       const { setTrendingAnime, setPopularAnime, setTrendingManga } = useDataStore.getState();
 
-      const { setUserProfile } = useAuthStore.getState();
+      const { setUserProfile, setUserAnimeLibraryLists, setUserMangaLibraryLists } =
+         useAuthStore.getState();
 
       const [trendingAnimeResult, popularAnimeResult, trendingMangaResult, userProfileResult] =
          await Promise.all([
@@ -70,6 +82,9 @@ export default function RootLayout() {
             client.query(GetTrendingMangaQuery, {}, { requestPolicy: "network-only" }).toPromise(),
             client.query(GetAuthUserDataQuery, {}, { requestPolicy: "network-only" }).toPromise(),
          ]);
+
+      let userAnimeLibraryResult = null;
+      let userMangaLibraryResult = null;
 
       if (!useAuthStore.getState().isLoggedIn) {
          return;
@@ -93,6 +108,38 @@ export default function RootLayout() {
       if (userProfileResult.data?.Viewer) {
          setUserProfile(userProfileResult.data.Viewer);
          preloadUserProfileImages(userProfileResult.data.Viewer);
+
+         userAnimeLibraryResult = await client
+            .query(
+               GetUserLibraryQuery,
+               { userId: userProfileResult.data.Viewer.id, type: MediaType.Anime },
+               { requestPolicy: "network-only" },
+            )
+            .toPromise();
+
+         userMangaLibraryResult = await client
+            .query(
+               GetUserLibraryQuery,
+               { userId: userProfileResult.data.Viewer.id, type: MediaType.Manga },
+               { requestPolicy: "network-only" },
+            )
+            .toPromise();
+      }
+
+      if (
+         userAnimeLibraryResult?.data?.MediaListCollection?.lists &&
+         userAnimeLibraryResult?.data?.MediaListCollection?.lists.length > 0
+      ) {
+         setUserAnimeLibraryLists(userAnimeLibraryResult?.data?.MediaListCollection?.lists);
+         preloadUserLibraryImages(userAnimeLibraryResult?.data?.MediaListCollection?.lists);
+      }
+
+      if (
+         userMangaLibraryResult?.data?.MediaListCollection?.lists &&
+         userMangaLibraryResult?.data?.MediaListCollection?.lists.length > 0
+      ) {
+         setUserMangaLibraryLists(userMangaLibraryResult?.data?.MediaListCollection?.lists);
+         preloadUserLibraryImages(userMangaLibraryResult?.data?.MediaListCollection?.lists);
       }
    };
 
