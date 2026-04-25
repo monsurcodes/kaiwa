@@ -21,6 +21,7 @@ export const GetUserLibraryQuery = gql(/* GraphQL */ `
                   episodes
                   chapters
                   format
+                  type
                   nextAiringEpisode {
                      episode
                      airingAt
