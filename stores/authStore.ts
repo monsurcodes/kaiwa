@@ -8,11 +8,13 @@ interface AuthState {
    token: string | null;
    expiresAt: number | null;
    userProfile: UserProfile | null;
-   userLibraryLists: UserLibraryLists | null;
+   userAnimeLibraryLists: UserLibraryLists | null;
+   userMangaLibraryLists: UserLibraryLists | null;
    isLoggedIn: boolean;
    setToken: (token: string, expiresAt: number) => void;
    setUserProfile: (data: UserProfile) => void;
-   setUserLibraryLists: (lists: UserLibraryLists) => void;
+   setUserAnimeLibraryLists: (lists: UserLibraryLists) => void;
+   setUserMangaLibraryLists: (lists: UserLibraryLists) => void;
    logout: () => void;
 }
 
@@ -29,7 +31,8 @@ export const useAuthStore = create<AuthState>()(
          token: null,
          expiresAt: null,
          userProfile: null,
-         userLibraryLists: null,
+         userAnimeLibraryLists: null,
+         userMangaLibraryLists: null,
          isLoggedIn: false,
 
          setToken: (token, expiresAt) => {
@@ -39,7 +42,8 @@ export const useAuthStore = create<AuthState>()(
 
          setUserProfile: (data) => set({ userProfile: data }),
 
-         setUserLibraryLists: (lists) => set({ userLibraryLists: lists }),
+         setUserAnimeLibraryLists: (lists) => set({ userAnimeLibraryLists: lists }),
+         setUserMangaLibraryLists: (lists) => set({ userMangaLibraryLists: lists }),
 
          logout: () => {
             set({ token: null, expiresAt: null, isLoggedIn: false, userProfile: null });
