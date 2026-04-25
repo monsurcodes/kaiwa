@@ -77,6 +77,18 @@ export const GetAuthUserDataQuery = gql(/* GraphQL */ `
                }
             }
          }
+         mediaListOptions {
+            animeList {
+               customLists
+               sectionOrder
+            }
+            mangaList {
+               customLists
+               sectionOrder
+            }
+            rowOrder
+            scoreFormat
+         }
       }
    }
 `);
