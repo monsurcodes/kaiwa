@@ -1,18 +1,18 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { GetAuthUserDataQuery } from "@/lib/graphql/generated/graphql";
 import { storage } from "@/lib/storage/mmkv";
-
-type UserProfile = NonNullable<GetAuthUserDataQuery["Viewer"]>;
+import { UserLibraryLists, UserProfile } from "@/types";
 
 interface AuthState {
    token: string | null;
    expiresAt: number | null;
    userProfile: UserProfile | null;
+   userLibraryLists: UserLibraryLists | null;
    isLoggedIn: boolean;
    setToken: (token: string, expiresAt: number) => void;
    setUserProfile: (data: UserProfile) => void;
+   setUserLibraryLists: (lists: UserLibraryLists) => void;
    logout: () => void;
 }
 
@@ -29,6 +29,7 @@ export const useAuthStore = create<AuthState>()(
          token: null,
          expiresAt: null,
          userProfile: null,
+         userLibraryLists: null,
          isLoggedIn: false,
 
          setToken: (token, expiresAt) => {
@@ -37,6 +38,8 @@ export const useAuthStore = create<AuthState>()(
          },
 
          setUserProfile: (data) => set({ userProfile: data }),
+
+         setUserLibraryLists: (lists) => set({ userLibraryLists: lists }),
 
          logout: () => {
             set({ token: null, expiresAt: null, isLoggedIn: false, userProfile: null });

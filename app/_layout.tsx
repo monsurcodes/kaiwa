@@ -11,18 +11,21 @@ import { Provider } from "urql";
 
 import { theme } from "@/constants/theme";
 import { client } from "@/lib/graphql/client";
-import type {
-   GetAuthUserDataQuery as GetAuthUserDataQueryData,
-   GetPopularAnimeQuery as GetPopularAnimeQueryData,
-   GetTrendingAnimeQuery as GetTrendingAnimeQueryData,
-   GetTrendingMangaQuery as GetTrendingMangaQueryData,
+import {
+   type GetAuthUserDataQuery as GetAuthUserDataQueryData,
+   type GetPopularAnimeQuery as GetPopularAnimeQueryData,
+   type GetTrendingAnimeQuery as GetTrendingAnimeQueryData,
+   type GetTrendingMangaQuery as GetTrendingMangaQueryData,
+   MediaType,
 } from "@/lib/graphql/generated/graphql";
 import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
 import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
+import { GetUserLibraryQuery } from "@/lib/graphql/queries/getUserLibrary";
 import { useAuthStore } from "@/stores/authStore";
 import { useDataStore } from "@/stores/dataStore";
+import { UserLibraryLists } from "@/types";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -55,13 +58,21 @@ export default function RootLayout() {
          Image.prefetch(urls);
       };
 
+      const preloadUserLibraryImages = (lists: UserLibraryLists) => {
+         const urls = lists
+            .flatMap((list) => list?.entries)
+            .map((entry) => entry?.media?.coverImage?.large)
+            .filter(isString);
+         Image.prefetch(urls);
+      };
+
       if (!useAuthStore.getState().isLoggedIn) {
          return;
       }
 
       const { setTrendingAnime, setPopularAnime, setTrendingManga } = useDataStore.getState();
 
-      const { setUserProfile } = useAuthStore.getState();
+      const { setUserProfile, setUserLibraryLists } = useAuthStore.getState();
 
       const [trendingAnimeResult, popularAnimeResult, trendingMangaResult, userProfileResult] =
          await Promise.all([
@@ -70,6 +81,8 @@ export default function RootLayout() {
             client.query(GetTrendingMangaQuery, {}, { requestPolicy: "network-only" }).toPromise(),
             client.query(GetAuthUserDataQuery, {}, { requestPolicy: "network-only" }).toPromise(),
          ]);
+
+      let userLibraryResult = null;
 
       if (!useAuthStore.getState().isLoggedIn) {
          return;
@@ -93,6 +106,22 @@ export default function RootLayout() {
       if (userProfileResult.data?.Viewer) {
          setUserProfile(userProfileResult.data.Viewer);
          preloadUserProfileImages(userProfileResult.data.Viewer);
+
+         userLibraryResult = await client
+            .query(
+               GetUserLibraryQuery,
+               { userId: userProfileResult.data.Viewer.id, type: MediaType.Anime },
+               { requestPolicy: "network-only" },
+            )
+            .toPromise();
+      }
+
+      if (
+         userLibraryResult?.data?.MediaListCollection?.lists &&
+         userLibraryResult?.data?.MediaListCollection?.lists.length > 0
+      ) {
+         setUserLibraryLists(userLibraryResult?.data?.MediaListCollection?.lists);
+         preloadUserLibraryImages(userLibraryResult?.data?.MediaListCollection?.lists);
       }
    };
 
