@@ -1,8 +1,6 @@
 import { useRouter } from "expo-router";
 import { Settings } from "lucide-react-native";
-import { useEffect } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
-import { useQuery } from "urql";
 
 import AboutCard from "@/components/profile/AboutCard";
 import FavAnimeList from "@/components/profile/FavAnimeList";
@@ -13,30 +11,13 @@ import FavStudioList from "@/components/profile/FavStudioList";
 import ProfileHeroBanner from "@/components/profile/ProfileHeroBanner";
 import StatsInfo from "@/components/profile/StatsInfo";
 import FloatingButton from "@/components/ui/FloatingButton";
-import { GetAuthUserDataQuery } from "@/lib/graphql/queries/getAuthUserData";
-import { useAuthStore } from "@/stores/authStore";
+import { useAuthUserDetail } from "@/hooks/useAuthUserDetail";
 
 const Profile = () => {
    const router = useRouter();
-   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-   const { userProfile, setUserProfile } = useAuthStore();
+   const { profileData, fetching, error } = useAuthUserDetail();
 
-   const [authUser] = useQuery({
-      query: GetAuthUserDataQuery,
-      pause: !isLoggedIn || Boolean(userProfile),
-      requestPolicy: "network-only",
-   });
-
-   const { data, fetching, error } = authUser;
-   const profileData = userProfile ?? data?.Viewer;
-
-   useEffect(() => {
-      if (isLoggedIn && !userProfile && data?.Viewer) {
-         setUserProfile(data.Viewer);
-      }
-   }, [data?.Viewer, isLoggedIn, setUserProfile, userProfile]);
-
-   if (error) console.error("Error fetching authenticated user data:", error);
+   if (error) console.error("Error fetching profile data:", error);
 
    if (!profileData && fetching)
       return (
