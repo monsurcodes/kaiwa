@@ -72,7 +72,8 @@ export default function RootLayout() {
 
       const { setTrendingAnime, setPopularAnime, setTrendingManga } = useDataStore.getState();
 
-      const { setUserProfile, setUserLibraryLists } = useAuthStore.getState();
+      const { setUserProfile, setUserAnimeLibraryLists, setUserMangaLibraryLists } =
+         useAuthStore.getState();
 
       const [trendingAnimeResult, popularAnimeResult, trendingMangaResult, userProfileResult] =
          await Promise.all([
@@ -82,7 +83,8 @@ export default function RootLayout() {
             client.query(GetAuthUserDataQuery, {}, { requestPolicy: "network-only" }).toPromise(),
          ]);
 
-      let userLibraryResult = null;
+      let userAnimeLibraryResult = null;
+      let userMangaLibraryResult = null;
 
       if (!useAuthStore.getState().isLoggedIn) {
          return;
@@ -107,21 +109,37 @@ export default function RootLayout() {
          setUserProfile(userProfileResult.data.Viewer);
          preloadUserProfileImages(userProfileResult.data.Viewer);
 
-         userLibraryResult = await client
+         userAnimeLibraryResult = await client
             .query(
                GetUserLibraryQuery,
                { userId: userProfileResult.data.Viewer.id, type: MediaType.Anime },
                { requestPolicy: "network-only" },
             )
             .toPromise();
+
+         userMangaLibraryResult = await client
+            .query(
+               GetUserLibraryQuery,
+               { userId: userProfileResult.data.Viewer.id, type: MediaType.Manga },
+               { requestPolicy: "network-only" },
+            )
+            .toPromise();
       }
 
       if (
-         userLibraryResult?.data?.MediaListCollection?.lists &&
-         userLibraryResult?.data?.MediaListCollection?.lists.length > 0
+         userAnimeLibraryResult?.data?.MediaListCollection?.lists &&
+         userAnimeLibraryResult?.data?.MediaListCollection?.lists.length > 0
       ) {
-         setUserLibraryLists(userLibraryResult?.data?.MediaListCollection?.lists);
-         preloadUserLibraryImages(userLibraryResult?.data?.MediaListCollection?.lists);
+         setUserAnimeLibraryLists(userAnimeLibraryResult?.data?.MediaListCollection?.lists);
+         preloadUserLibraryImages(userAnimeLibraryResult?.data?.MediaListCollection?.lists);
+      }
+
+      if (
+         userMangaLibraryResult?.data?.MediaListCollection?.lists &&
+         userMangaLibraryResult?.data?.MediaListCollection?.lists.length > 0
+      ) {
+         setUserMangaLibraryLists(userMangaLibraryResult?.data?.MediaListCollection?.lists);
+         preloadUserLibraryImages(userMangaLibraryResult?.data?.MediaListCollection?.lists);
       }
    };
 
