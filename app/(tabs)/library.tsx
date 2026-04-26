@@ -133,7 +133,7 @@ const Library = () => {
             />
          </View>
 
-         <View className="mt-2 flex-1">
+         <View className="mt-2 flex-1 px-1">
             <FlashList
                data={flattenedData}
                keyExtractor={(item, index) =>
