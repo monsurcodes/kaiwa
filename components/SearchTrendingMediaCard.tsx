@@ -151,7 +151,7 @@ const SearchTrendingMediaCard = ({
             {status && (
                <View>
                   <Text className={`mt-2 text-sm font-semibold ${statusTextColor}`}>
-                     ● {status}
+                     ● {status === MediaListStatus.Current ? "WATCHING" : status}
                   </Text>
                </View>
             )}
