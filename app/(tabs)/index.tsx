@@ -5,10 +5,13 @@ import { useEffect } from "react";
 import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, View } from "react-native";
 import { useQuery } from "urql";
 
+import ReleasingTodayCard from "@/components/ReleasingTodayCard";
 import TrendingMediaCard from "@/components/TrendingMediaCard";
 import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
+import { compareTimestampTodayFirstTomorrowLast, isTimestampToday } from "@/lib/utils/date";
+import { useAuthStore } from "@/stores/authStore";
 import { useDataStore } from "@/stores/dataStore";
 
 const { width } = Dimensions.get("window");
@@ -24,6 +27,8 @@ const Index = () => {
       setPopularAnime,
       setTrendingManga,
    } = useDataStore();
+
+   const { userAnimeLibraryLists } = useAuthStore();
 
    const handleSearchPress = () => {
       router.push("/search");
@@ -84,6 +89,19 @@ const Index = () => {
       (!popularAnime && popularAnimeFetching) ||
       (!trendingManga && mangaFetching);
 
+   const entires = userAnimeLibraryLists
+      ?.flatMap((list) => list?.entries ?? [])
+      .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
+
+   const releasingEntires = entires
+      ?.filter((entry) => isTimestampToday(entry?.media?.nextAiringEpisode?.airingAt))
+      .sort((firstEntry, secondEntry) =>
+         compareTimestampTodayFirstTomorrowLast(
+            firstEntry?.media?.nextAiringEpisode?.airingAt,
+            secondEntry?.media?.nextAiringEpisode?.airingAt,
+         ),
+      );
+
    if (shouldShowLoading)
       return (
          <View className="flex-1 gap-3">
@@ -118,9 +136,24 @@ const Index = () => {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
          >
+            {/* Releasing Today */}
+            {releasingEntires && releasingEntires.length > 0 && (
+               <View>
+                  <Text className="mb-2 mt-6 text-xl font-semibold text-white">
+                     Releasing Today
+                  </Text>
+                  <FlashList
+                     data={releasingEntires}
+                     renderItem={({ item }) => <ReleasingTodayCard item={item} />}
+                     horizontal
+                     showsHorizontalScrollIndicator={false}
+                  />
+               </View>
+            )}
+
             {/* Trending Anime */}
             {trendingAnimeData && (
-               <Text className="mb-2 mt-6 text-xl font-semibold text-white">Trending Anime</Text>
+               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Trending Anime</Text>
             )}
             {trendingAnimeData && (
                <FlashList
@@ -150,7 +183,7 @@ const Index = () => {
 
             {/* Popular Anime */}
             {popularAnimeData && (
-               <Text className="mb-2 mt-6 text-xl font-semibold text-white">Popular Anime</Text>
+               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Popular Anime</Text>
             )}
             {popularAnimeData && (
                <FlashList
@@ -180,7 +213,7 @@ const Index = () => {
 
             {/* Trending Manga */}
             {trendingMangaData && (
-               <Text className="mb-2 mt-6 text-xl font-semibold text-white">Trending Manga</Text>
+               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Trending Manga</Text>
             )}
             {trendingMangaData && (
                <FlashList
