@@ -1,7 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { Search } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import LibraryMediaCard from "@/components/LibraryMediaCard";
 import { MediaType } from "@/lib/graphql/generated/graphql";
@@ -82,14 +82,6 @@ const Library = () => {
       statusFilter,
       searchQuery,
    ]);
-
-   if (!userAnimeLibraryLists || !userMangaLibraryLists) {
-      return (
-         <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color="#fff" />
-         </View>
-      );
-   }
 
    return (
       <View className="w-full flex-1">
