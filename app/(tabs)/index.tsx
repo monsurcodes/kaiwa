@@ -1,16 +1,26 @@
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { Search } from "lucide-react-native";
-import { useEffect } from "react";
-import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+   ActivityIndicator,
+   Dimensions,
+   Pressable,
+   RefreshControl,
+   ScrollView,
+   Text,
+   View,
+} from "react-native";
 import { useQuery } from "urql";
 
 import ReleasingTodayCard from "@/components/ReleasingTodayCard";
 import TrendingMediaCard from "@/components/TrendingMediaCard";
+import { theme } from "@/constants/theme";
 import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
 import { compareTimestampTodayFirstTomorrowLast, isTimestampToday } from "@/lib/utils/date";
+import { refreshCachedData } from "@/lib/utils/refreshData";
 import { useAuthStore } from "@/stores/authStore";
 import { useDataStore } from "@/stores/dataStore";
 
@@ -19,6 +29,14 @@ const CARD_WIDTH = width * 0.8;
 
 const Index = () => {
    const router = useRouter();
+
+   const [refreshing, setRefreshing] = useState(false);
+   const onRefresh = async () => {
+      setRefreshing(true);
+      await refreshCachedData();
+      setRefreshing(false);
+   };
+
    const {
       trendingAnime,
       popularAnime,
@@ -135,6 +153,15 @@ const Index = () => {
             className="flex-1"
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
+            refreshControl={
+               <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  tintColor={theme.accent.dark}
+                  colors={[theme.accent.dark]}
+                  progressBackgroundColor={theme.bg.overlay}
+               />
+            }
          >
             {/* Releasing Today */}
             {releasingEntires && releasingEntires.length > 0 && (
