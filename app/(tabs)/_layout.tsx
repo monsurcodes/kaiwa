@@ -7,7 +7,7 @@ import { theme } from "@/constants/theme";
 const TabBarIcon = ({ Icon, isFocused }: { Icon: LucideIcon; isFocused: boolean }) => {
    return (
       <View className="mt-2 size-full items-center justify-center rounded-full p-4">
-         <Icon size={24} color={isFocused ? theme.tab.iconActive : theme.tab.iconInactive} />
+         <Icon size={24} color={isFocused ? theme.accent.light : theme.tab.iconInactive} />
       </View>
    );
 };
@@ -26,7 +26,7 @@ const Layout = () => {
                justifyContent: "center",
                alignItems: "center",
             },
-            tabBarActiveTintColor: theme.tab.iconActive,
+            tabBarActiveTintColor: theme.accent.light,
             tabBarInactiveTintColor: theme.tab.iconInactive,
             tabBarLabelStyle: {
                fontSize: 12,
