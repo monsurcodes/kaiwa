@@ -74,6 +74,9 @@ export const GetAnimeByIdQuery = gql(/* GraphQL */ `
             airingAt
             timeUntilAiring
          }
+         mediaListEntry {
+            status
+         }
          tags {
             id
             name

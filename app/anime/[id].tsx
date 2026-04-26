@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { SquarePen } from "lucide-react-native";
 import { ActivityIndicator, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -13,12 +14,17 @@ import StatsBar from "@/components/media/StatsBar";
 import SynopsisCard from "@/components/media/SynopsisCard";
 import TagList from "@/components/media/TagList";
 import TrailerCard from "@/components/media/TrailerCard";
+import FloatingButton from "@/components/ui/FloatingButton";
 import { useAnimeDetail } from "@/hooks/useAnimeDetail";
 import { useCharacters } from "@/hooks/useCharacters";
 import { useMediaId } from "@/hooks/useMediaId";
 
 const Anime = () => {
    const router = useRouter();
+
+   const mediaId = useMediaId();
+   const characters = useCharacters(mediaId);
+   const { data, fetching, error } = useAnimeDetail(mediaId);
 
    // close button and option button handlers
    // TODO: Takes more time to close the screen than direct back button navigation. Optimize by using a custom animation or using native navigation pop if possible.
@@ -30,9 +36,14 @@ const Anime = () => {
       // Implement option button logic, e.g., show action sheet
    };
 
-   const mediaId = useMediaId();
-   const characters = useCharacters(mediaId);
-   const { data, fetching, error } = useAnimeDetail(mediaId);
+   const handlerEditPress = () => {
+      console.log(
+         "Edit pressed:",
+         data?.Media?.id,
+         data?.Media?.format,
+         data?.Media?.mediaListEntry?.status,
+      );
+   };
 
    if (error) console.error("Error fetching anime data for media ID ", mediaId, ":", error);
 
@@ -70,6 +81,8 @@ const Anime = () => {
             </View>
             <View className="mb-20"></View>
          </ScrollView>
+
+         <FloatingButton Icon={SquarePen} onPress={handlerEditPress} bottomPos={80} rightPos={34} />
       </View>
    );
 };

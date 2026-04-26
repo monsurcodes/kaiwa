@@ -24,3 +24,66 @@ export const getMonth = (month: number): string => {
       .format(new Date(Date.UTC(2026, month - 1, 1)))
       .toUpperCase();
 };
+
+const getReferenceDate = (): Date => {
+   return new Date();
+};
+
+const isSameDate = (first: Date, second: Date): boolean =>
+   first.getFullYear() === second.getFullYear() &&
+   first.getMonth() === second.getMonth() &&
+   first.getDate() === second.getDate();
+
+export const isTimestampToday = (timestamp: number | null | undefined): boolean => {
+   if (!timestamp) return false;
+
+   const targetDate = new Date(timestamp * 1000);
+   const referenceDate = getReferenceDate();
+
+   const tomorrow = new Date(referenceDate);
+   tomorrow.setDate(referenceDate.getDate() + 1);
+
+   return isSameDate(targetDate, referenceDate) || isSameDate(targetDate, tomorrow);
+};
+
+export const compareTimestampTodayFirstTomorrowLast = (
+   firstTimestamp: number | null | undefined,
+   secondTimestamp: number | null | undefined,
+): number => {
+   const referenceDate = getReferenceDate();
+   const tomorrow = new Date(referenceDate);
+   tomorrow.setDate(referenceDate.getDate() + 1);
+
+   const getPriority = (timestamp: number | null | undefined): number => {
+      if (!timestamp) return 1;
+
+      const date = new Date(timestamp * 1000);
+
+      if (isSameDate(date, referenceDate)) return 0;
+      if (isSameDate(date, tomorrow)) return 2;
+      return 1;
+   };
+
+   const priorityDiff = getPriority(firstTimestamp) - getPriority(secondTimestamp);
+   if (priorityDiff !== 0) return priorityDiff;
+
+   const first = firstTimestamp ?? 0;
+   const second = secondTimestamp ?? 0;
+   return first - second;
+};
+
+export const getTimestampDayLabel = (
+   timestamp: number | null | undefined,
+): "today" | "tomorrow" | null => {
+   if (!timestamp) return null;
+
+   const targetDate = new Date(timestamp * 1000);
+   const referenceDate = getReferenceDate();
+   const tomorrow = new Date(referenceDate);
+   tomorrow.setDate(referenceDate.getDate() + 1);
+
+   if (isSameDate(targetDate, referenceDate)) return "today";
+   if (isSameDate(targetDate, tomorrow)) return "tomorrow";
+
+   return null;
+};

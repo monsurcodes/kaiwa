@@ -1,10 +1,12 @@
 import { FlashList } from "@shopify/flash-list";
 import { Search } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, RefreshControl, Text, TextInput, View } from "react-native";
 
 import LibraryMediaCard from "@/components/LibraryMediaCard";
+import { theme } from "@/constants/theme";
 import { MediaType } from "@/lib/graphql/generated/graphql";
+import { refreshCachedData } from "@/lib/utils/refreshData";
 import { useAuthStore } from "@/stores/authStore";
 
 type FlatLibraryItem = { type: "header"; name: string } | { type: "card"; entry: any };
@@ -12,28 +14,29 @@ type FlatLibraryItem = { type: "header"; name: string } | { type: "card"; entry:
 const Library = () => {
    const { userAnimeLibraryLists, userMangaLibraryLists, userProfile } = useAuthStore();
 
-   // Local UI State
+   const [refreshing, setRefreshing] = useState(false);
+   const onRefresh = async () => {
+      setRefreshing(true);
+      await refreshCachedData();
+      setRefreshing(false);
+   };
+
    const [activeType, setActiveType] = useState<MediaType>(MediaType.Anime);
    const [statusFilter, setStatusFilter] = useState("ALL");
    const [searchQuery, setSearchQuery] = useState("");
 
-   // Dynamic Sections from User Profile
    const dynamicSections = useMemo(() => {
       const order =
          (activeType === MediaType.Anime
             ? userProfile?.mediaListOptions?.animeList?.sectionOrder
             : userProfile?.mediaListOptions?.mangaList?.sectionOrder) ?? [];
 
-      // Filter out empty strings and ensure "ALL" is always at the start
       return ["ALL", ...order.filter((name): name is string => Boolean(name && name.length > 0))];
    }, [userProfile, activeType]);
 
-   // Compute Filtered & Flattened Data
    const flattenedData = useMemo(() => {
       const isAnime = activeType === MediaType.Anime;
       const sourceLists = isAnime ? userAnimeLibraryLists : userMangaLibraryLists;
-
-      // Pull order directly from the dynamic list (excluding "ALL")
       const order = dynamicSections.filter((s) => s !== "ALL");
 
       if (!sourceLists) return [];
@@ -41,13 +44,11 @@ const Library = () => {
       const result: FlatLibraryItem[] = [];
 
       order.forEach((sectionName) => {
-         // Filter: Only show the selected section if filter is not "ALL"
          if (statusFilter !== "ALL" && sectionName !== statusFilter) return;
 
          const currentList = sourceLists.find((l) => l?.name === sectionName);
          if (!currentList?.entries) return;
 
-         // Search Filter
          const filteredEntries = currentList.entries.filter((entry) => {
             const title = (
                entry?.media?.title?.english ??
@@ -60,7 +61,6 @@ const Library = () => {
          if (filteredEntries.length > 0) {
             result.push({ type: "header", name: sectionName });
 
-            // Alpha Sort
             const sortedEntries = [...filteredEntries].sort((a, b) => {
                const titleA = a?.media?.title?.english || a?.media?.title?.romaji || "";
                const titleB = b?.media?.title?.english || b?.media?.title?.romaji || "";
@@ -82,14 +82,6 @@ const Library = () => {
       statusFilter,
       searchQuery,
    ]);
-
-   if (!userAnimeLibraryLists || !userMangaLibraryLists) {
-      return (
-         <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color="#fff" />
-         </View>
-      );
-   }
 
    return (
       <View className="w-full flex-1">
@@ -150,6 +142,15 @@ const Library = () => {
                getItemType={(item) => item.type}
                showsVerticalScrollIndicator={false}
                contentContainerStyle={{ paddingBottom: 100 }}
+               refreshControl={
+                  <RefreshControl
+                     refreshing={refreshing}
+                     onRefresh={onRefresh}
+                     tintColor={theme.accent.dark}
+                     colors={[theme.accent.dark]}
+                     progressBackgroundColor={theme.bg.overlay}
+                  />
+               }
                renderItem={({ item }) => {
                   if (item.type === "header") {
                      return (

@@ -1,14 +1,27 @@
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { Search } from "lucide-react-native";
-import { useEffect } from "react";
-import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+   ActivityIndicator,
+   Dimensions,
+   Pressable,
+   RefreshControl,
+   ScrollView,
+   Text,
+   View,
+} from "react-native";
 import { useQuery } from "urql";
 
+import ReleasingTodayCard from "@/components/ReleasingTodayCard";
 import TrendingMediaCard from "@/components/TrendingMediaCard";
+import { theme } from "@/constants/theme";
 import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
+import { compareTimestampTodayFirstTomorrowLast, isTimestampToday } from "@/lib/utils/date";
+import { refreshCachedData } from "@/lib/utils/refreshData";
+import { useAuthStore } from "@/stores/authStore";
 import { useDataStore } from "@/stores/dataStore";
 
 const { width } = Dimensions.get("window");
@@ -16,6 +29,14 @@ const CARD_WIDTH = width * 0.8;
 
 const Index = () => {
    const router = useRouter();
+
+   const [refreshing, setRefreshing] = useState(false);
+   const onRefresh = async () => {
+      setRefreshing(true);
+      await refreshCachedData();
+      setRefreshing(false);
+   };
+
    const {
       trendingAnime,
       popularAnime,
@@ -24,6 +45,8 @@ const Index = () => {
       setPopularAnime,
       setTrendingManga,
    } = useDataStore();
+
+   const { userAnimeLibraryLists } = useAuthStore();
 
    const handleSearchPress = () => {
       router.push("/search");
@@ -84,6 +107,19 @@ const Index = () => {
       (!popularAnime && popularAnimeFetching) ||
       (!trendingManga && mangaFetching);
 
+   const entires = userAnimeLibraryLists
+      ?.flatMap((list) => list?.entries ?? [])
+      .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
+
+   const releasingEntires = entires
+      ?.filter((entry) => isTimestampToday(entry?.media?.nextAiringEpisode?.airingAt))
+      .sort((firstEntry, secondEntry) =>
+         compareTimestampTodayFirstTomorrowLast(
+            firstEntry?.media?.nextAiringEpisode?.airingAt,
+            secondEntry?.media?.nextAiringEpisode?.airingAt,
+         ),
+      );
+
    if (shouldShowLoading)
       return (
          <View className="flex-1 gap-3">
@@ -117,10 +153,34 @@ const Index = () => {
             className="flex-1"
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
+            refreshControl={
+               <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  tintColor={theme.accent.dark}
+                  colors={[theme.accent.dark]}
+                  progressBackgroundColor={theme.bg.overlay}
+               />
+            }
          >
+            {/* Releasing Today */}
+            {releasingEntires && releasingEntires.length > 0 && (
+               <View>
+                  <Text className="mb-2 mt-6 text-xl font-semibold text-white">
+                     Releasing Today
+                  </Text>
+                  <FlashList
+                     data={releasingEntires}
+                     renderItem={({ item }) => <ReleasingTodayCard item={item} />}
+                     horizontal
+                     showsHorizontalScrollIndicator={false}
+                  />
+               </View>
+            )}
+
             {/* Trending Anime */}
             {trendingAnimeData && (
-               <Text className="mb-2 mt-6 text-xl font-semibold text-white">Trending Anime</Text>
+               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Trending Anime</Text>
             )}
             {trendingAnimeData && (
                <FlashList
@@ -150,7 +210,7 @@ const Index = () => {
 
             {/* Popular Anime */}
             {popularAnimeData && (
-               <Text className="mb-2 mt-6 text-xl font-semibold text-white">Popular Anime</Text>
+               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Popular Anime</Text>
             )}
             {popularAnimeData && (
                <FlashList
@@ -180,7 +240,7 @@ const Index = () => {
 
             {/* Trending Manga */}
             {trendingMangaData && (
-               <Text className="mb-2 mt-6 text-xl font-semibold text-white">Trending Manga</Text>
+               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Trending Manga</Text>
             )}
             {trendingMangaData && (
                <FlashList

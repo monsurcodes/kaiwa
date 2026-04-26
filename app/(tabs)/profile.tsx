@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { Settings } from "lucide-react-native";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native";
 
 import AboutCard from "@/components/profile/AboutCard";
 import FavAnimeList from "@/components/profile/FavAnimeList";
@@ -11,10 +12,20 @@ import FavStudioList from "@/components/profile/FavStudioList";
 import ProfileHeroBanner from "@/components/profile/ProfileHeroBanner";
 import StatsInfo from "@/components/profile/StatsInfo";
 import FloatingButton from "@/components/ui/FloatingButton";
+import { theme } from "@/constants/theme";
 import { useAuthUserDetail } from "@/hooks/useAuthUserDetail";
+import { refreshCachedData } from "@/lib/utils/refreshData";
 
 const Profile = () => {
    const router = useRouter();
+
+   const [refreshing, setRefreshing] = useState(false);
+   const onRefresh = async () => {
+      setRefreshing(true);
+      await refreshCachedData();
+      setRefreshing(false);
+   };
+
    const { profileData, fetching, error } = useAuthUserDetail();
 
    if (error) console.error("Error fetching profile data:", error);
@@ -32,6 +43,15 @@ const Profile = () => {
             className="flex-1"
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
+            refreshControl={
+               <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  tintColor={theme.accent.dark}
+                  colors={[theme.accent.dark]}
+                  progressBackgroundColor={theme.bg.overlay}
+               />
+            }
          >
             <ProfileHeroBanner profileData={profileData} />
             <AboutCard aboutText={profileData?.about} />
