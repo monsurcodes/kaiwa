@@ -62,6 +62,9 @@ export const GetMangaByIdQuery = gql(/* GraphQL */ `
             description
             isMediaSpoiler
          }
+         mediaListEntry {
+            status
+         }
          recommendations {
             nodes {
                mediaRecommendation {
