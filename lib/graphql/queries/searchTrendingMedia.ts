@@ -20,6 +20,9 @@ export const SearchTrendingMediaQuery = gql(/* GraphQL */ `
             episodes
             chapters
             type
+            mediaListEntry {
+               status
+            }
          }
       }
    }

@@ -4,6 +4,8 @@ import { Heart, Star } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
+import { MediaListStatus } from "@/lib/graphql/generated/graphql";
+
 interface SearchTrendingMediaCardProps {
    id: number;
    title: string;
@@ -16,6 +18,7 @@ interface SearchTrendingMediaCardProps {
    chapters?: number | null;
    genres: string[];
    type: string;
+   status: MediaListStatus | null | undefined;
 }
 
 const SearchTrendingMediaCard = ({
@@ -30,6 +33,7 @@ const SearchTrendingMediaCard = ({
    chapters,
    genres,
    type,
+   status,
 }: SearchTrendingMediaCardProps) => {
    const router = useRouter();
    const [genreRowWidth, setGenreRowWidth] = useState(0);
@@ -63,6 +67,30 @@ const SearchTrendingMediaCard = ({
          router.push(`/manga/${id}`);
       }
    };
+
+   let statusTextColor;
+   switch (status) {
+      case MediaListStatus.Current:
+         statusTextColor = "text-green-400";
+         break;
+      case MediaListStatus.Repeating:
+         statusTextColor = "text-green-400";
+         break;
+      case MediaListStatus.Planning:
+         statusTextColor = "text-blue-400";
+         break;
+      case MediaListStatus.Completed:
+         statusTextColor = "text-purple-400";
+         break;
+      case MediaListStatus.Dropped:
+         statusTextColor = "text-red-400";
+         break;
+      case MediaListStatus.Paused:
+         statusTextColor = "text-red-400";
+         break;
+      default:
+         statusTextColor = "text-white-400";
+   }
 
    return (
       <Pressable
@@ -120,6 +148,13 @@ const SearchTrendingMediaCard = ({
                   </Text>
                ))}
             </View>
+            {status && (
+               <View>
+                  <Text className={`mt-2 text-sm font-semibold ${statusTextColor}`}>
+                     ● {status}
+                  </Text>
+               </View>
+            )}
          </View>
       </Pressable>
    );

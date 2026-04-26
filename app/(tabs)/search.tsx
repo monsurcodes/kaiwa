@@ -156,6 +156,7 @@ const SearchScreen = () => {
                      chapters={item.chapters}
                      genres={(item.genres ?? []).filter((g): g is string => g !== null)}
                      type={item.type ?? ""}
+                     status={item.mediaListEntry?.status}
                   />
                )}
                ListFooterComponent={

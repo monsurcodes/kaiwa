@@ -20,6 +20,9 @@ export const GetMediaByNameQuery = gql(/* GraphQL */ `
             episodes
             chapters
             type
+            mediaListEntry {
+               status
+            }
          }
       }
    }
