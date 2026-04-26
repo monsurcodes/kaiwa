@@ -3,6 +3,9 @@ import type {
    GetAuthUserDataQuery as GetAuthUserData,
    GetMangaByIdQuery as GetMangaByIdQueryData,
    GetMediaCharactersQuery as GetMediaCharactersData,
+   GetPopularAnimeQuery as GetPopularAnimeQueryData,
+   GetTrendingAnimeQuery as GetTrendingAnimeQueryData,
+   GetTrendingMangaQuery as GetTrendingMangaQueryData,
    GetUserLibraryQueryQuery as GetUserLibraryData,
 } from "@/lib/graphql/generated/graphql";
 
@@ -21,4 +24,12 @@ export type UserProfile = NonNullable<GetAuthUserData["Viewer"]>;
 
 export type UserLibraryLists = NonNullable<
    NonNullable<GetUserLibraryData["MediaListCollection"]>["lists"]
+>;
+
+export type TrendingAnimeMedia = NonNullable<
+   NonNullable<GetTrendingAnimeQueryData["Page"]>["media"]
+>;
+export type PopularAnimeMedia = NonNullable<NonNullable<GetPopularAnimeQueryData["Page"]>["media"]>;
+export type TrendingMangaMedia = NonNullable<
+   NonNullable<GetTrendingMangaQueryData["Page"]>["media"]
 >;
