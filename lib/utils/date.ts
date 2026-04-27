@@ -1,5 +1,5 @@
 export const formatAiringDate = (timestamp: number | null) => {
-   if (!timestamp) return;
+   if (timestamp === null || timestamp === undefined || timestamp === 0) return "TBA";
 
    return new Intl.DateTimeFormat("en-GB", {
       weekday: "short",
