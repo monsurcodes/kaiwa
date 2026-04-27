@@ -6,7 +6,7 @@ import type {
    GetTrendingAnimeQuery,
    GetTrendingMangaQuery,
 } from "@/lib/graphql/generated/graphql";
-import { storage } from "@/lib/storage/mmkv";
+import { mmkvZustandStorage } from "@/lib/storage/mmkv";
 
 type TrendingAnimeList = NonNullable<NonNullable<GetTrendingAnimeQuery["Page"]>["media"]>;
 type PopularAnimeList = NonNullable<NonNullable<GetPopularAnimeQuery["Page"]>["media"]>;
@@ -22,12 +22,6 @@ interface DataState {
    setTrendingManga: (data: TrendingMangaList) => void;
    clearCache: () => void;
 }
-
-const mmkvStorage = {
-   getItem: (name: string) => storage.getString(name) ?? null,
-   setItem: (name: string, value: string) => storage.set(name, value),
-   removeItem: (name: string) => storage.remove(name),
-};
 
 const initialDataState = {
    trendingAnime: null,
@@ -46,12 +40,11 @@ export const useDataStore = create<DataState>()(
 
          clearCache: () => {
             set(initialDataState);
-            storage.remove("data-cache");
          },
       }),
       {
          name: "data-cache",
-         storage: createJSONStorage(() => mmkvStorage),
+         storage: createJSONStorage(() => mmkvZustandStorage),
       },
    ),
 );
