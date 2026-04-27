@@ -6,7 +6,7 @@ import type {
    GetPopularAnimeQuery as GetPopularAnimeQueryData,
    GetTrendingAnimeQuery as GetTrendingAnimeQueryData,
    GetTrendingMangaQuery as GetTrendingMangaQueryData,
-   GetUserLibraryQueryQuery as GetUserLibraryData,
+   GetUserLibraryQuery as GetUserLibraryData,
 } from "@/lib/graphql/generated/graphql";
 
 export type CharacterEdge = NonNullable<
@@ -33,3 +33,13 @@ export type PopularAnimeMedia = NonNullable<NonNullable<GetPopularAnimeQueryData
 export type TrendingMangaMedia = NonNullable<
    NonNullable<GetTrendingMangaQueryData["Page"]>["media"]
 >;
+
+type LibraryEntry = NonNullable<
+   NonNullable<
+      NonNullable<NonNullable<GetUserLibraryData["MediaListCollection"]>["lists"]>[number]
+   >["entries"]
+>[number];
+
+export type LibraryListItem =
+   | { type: "header"; name: string }
+   | { type: "card"; entry: NonNullable<LibraryEntry> };
