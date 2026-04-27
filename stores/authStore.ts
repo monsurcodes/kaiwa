@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { FuzzyDateInput, MediaListStatus } from "@/lib/graphql/generated/graphql";
 import { storage } from "@/lib/storage/mmkv";
 import { UserLibraryLists, UserProfile } from "@/types";
 
@@ -11,12 +12,36 @@ interface AuthState {
    userAnimeLibraryLists: UserLibraryLists | null;
    userMangaLibraryLists: UserLibraryLists | null;
    isLoggedIn: boolean;
+
    setToken: (token: string, expiresAt: number) => void;
+
    setUserProfile: (data: UserProfile) => void;
    setUserAnimeLibraryLists: (lists: UserLibraryLists) => void;
    setUserMangaLibraryLists: (lists: UserLibraryLists) => void;
+
    logout: () => void;
+
+   updateEntryOptimistically: (
+      mediaId: number,
+      updates: OptimisticUpdateFields,
+      type: "ANIME" | "MANGA",
+   ) => void;
 }
+
+export type OptimisticUpdateFields = {
+   status?: MediaListStatus;
+   score?: number;
+   progress?: number;
+   progressVolumes?: number;
+   repeat?: number;
+   priority?: number;
+   private?: boolean;
+   notes?: string;
+   hiddenFromStatusLists?: boolean;
+   customLists?: string[];
+   startedAt?: FuzzyDateInput;
+   completedAt?: FuzzyDateInput;
+};
 
 // Custom storage bridge for MMKV and Zustand Persist
 const mmkvStorage = {
@@ -48,6 +73,26 @@ export const useAuthStore = create<AuthState>()(
          logout: () => {
             set({ token: null, expiresAt: null, isLoggedIn: false, userProfile: null });
             storage.remove("auth-storage");
+         },
+
+         updateEntryOptimistically: (mediaId, updates, type) => {
+            set((state: AuthState) => {
+               const lists =
+                  type === "ANIME" ? state.userAnimeLibraryLists : state.userMangaLibraryLists;
+
+               if (!lists) return state;
+
+               const updatedLists = lists.map((list) => ({
+                  ...list,
+                  entries: list?.entries?.map((entry) =>
+                     entry?.media?.id === mediaId ? { ...entry, ...updates } : entry,
+                  ),
+               }));
+
+               return type === "ANIME"
+                  ? { userAnimeLibraryLists: updatedLists }
+                  : { userMangaLibraryLists: updatedLists };
+            });
          },
       }),
       {
