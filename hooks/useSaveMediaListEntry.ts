@@ -7,7 +7,7 @@ import type {
    SaveMediaListEntryMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { SaveMediaListEntryMutation } from "@/lib/graphql/mutations/saveMediaListEntry";
-import { refreshUserLibrary } from "@/lib/utils/refreshData";
+import { refreshUserLibrary } from "@/stores/actions/refreshData";
 import { useAuthStore } from "@/stores/authStore";
 
 interface IVariables {
