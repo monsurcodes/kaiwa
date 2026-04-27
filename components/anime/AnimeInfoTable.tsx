@@ -28,7 +28,7 @@ const AnimeInfoTable = ({ media }: AnimeInfoTableProps) => {
                   <Text className="text-white">Episodes</Text>
                </View>
                <View className="w-1/2">
-                  <Text className="text-white">{media?.episodes ? media?.episodes : "?"}</Text>
+                  <Text className="text-white">{media?.episodes ?? "?"}</Text>
                </View>
             </View>
 

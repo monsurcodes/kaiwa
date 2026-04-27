@@ -28,7 +28,7 @@ const MangaInfoTable = ({ media }: MangaInfoTableProps) => {
                   <Text className="text-white">Chapters</Text>
                </View>
                <View className="w-1/2">
-                  <Text className="text-white">{media?.chapters ? media?.chapters : "?"}</Text>
+                  <Text className="text-white">{media?.chapters ?? "?"}</Text>
                </View>
             </View>
 
