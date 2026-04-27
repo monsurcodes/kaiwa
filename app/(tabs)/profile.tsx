@@ -14,7 +14,7 @@ import StatsInfo from "@/components/profile/StatsInfo";
 import FloatingButton from "@/components/ui/FloatingButton";
 import { theme } from "@/constants/theme";
 import { useAuthUserDetail } from "@/hooks/useAuthUserDetail";
-import { refreshCachedData } from "@/lib/utils/refreshData";
+import { refreshUserProfile } from "@/lib/utils/refreshData";
 
 const Profile = () => {
    const router = useRouter();
@@ -22,7 +22,7 @@ const Profile = () => {
    const [refreshing, setRefreshing] = useState(false);
    const onRefresh = async () => {
       setRefreshing(true);
-      await refreshCachedData();
+      await refreshUserProfile();
       setRefreshing(false);
    };
 

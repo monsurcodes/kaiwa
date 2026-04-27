@@ -20,7 +20,7 @@ import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
 import { compareTimestampTodayFirstTomorrowLast, isTimestampToday } from "@/lib/utils/date";
-import { refreshCachedData } from "@/lib/utils/refreshData";
+import { refreshHomeScreenMedia } from "@/lib/utils/refreshData";
 import { useAuthStore } from "@/stores/authStore";
 import { useDataStore } from "@/stores/dataStore";
 
@@ -33,7 +33,7 @@ const Index = () => {
    const [refreshing, setRefreshing] = useState(false);
    const onRefresh = async () => {
       setRefreshing(true);
-      await refreshCachedData();
+      await refreshHomeScreenMedia();
       setRefreshing(false);
    };
 
