@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { FuzzyDateInput, MediaListStatus } from "@/lib/graphql/generated/graphql";
-import { storage } from "@/lib/storage/mmkv";
+import { mmkvZustandStorage } from "@/lib/storage/mmkv";
 import { UserLibraryLists, UserProfile } from "@/types";
 
 interface AuthState {
@@ -43,13 +43,6 @@ export type OptimisticUpdateFields = {
    completedAt?: FuzzyDateInput;
 };
 
-// Custom storage bridge for MMKV and Zustand Persist
-const mmkvStorage = {
-   getItem: (name: string) => storage.getString(name) ?? null,
-   setItem: (name: string, value: string) => storage.set(name, value),
-   removeItem: (name: string) => storage.remove(name),
-};
-
 export const useAuthStore = create<AuthState>()(
    persist(
       (set) => ({
@@ -61,7 +54,6 @@ export const useAuthStore = create<AuthState>()(
          isLoggedIn: false,
 
          setToken: (token, expiresAt) => {
-            storage.remove("auth-storage");
             set({ token, expiresAt, isLoggedIn: true });
          },
 
@@ -71,12 +63,18 @@ export const useAuthStore = create<AuthState>()(
          setUserMangaLibraryLists: (lists) => set({ userMangaLibraryLists: lists }),
 
          logout: () => {
-            set({ token: null, expiresAt: null, isLoggedIn: false, userProfile: null });
-            storage.remove("auth-storage");
+            set({
+               token: null,
+               expiresAt: null,
+               isLoggedIn: false,
+               userProfile: null,
+               userAnimeLibraryLists: null,
+               userMangaLibraryLists: null,
+            });
          },
 
          updateEntryOptimistically: (mediaId, updates, type) => {
-            set((state: AuthState) => {
+            set((state) => {
                const lists =
                   type === "ANIME" ? state.userAnimeLibraryLists : state.userMangaLibraryLists;
 
@@ -97,7 +95,7 @@ export const useAuthStore = create<AuthState>()(
       }),
       {
          name: "auth-storage",
-         storage: createJSONStorage(() => mmkvStorage),
+         storage: createJSONStorage(() => mmkvZustandStorage),
       },
    ),
 );
