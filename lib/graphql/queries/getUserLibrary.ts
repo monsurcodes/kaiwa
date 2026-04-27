@@ -1,7 +1,7 @@
 import { gql } from "@/lib/graphql/generated";
 
 export const GetUserLibraryQuery = gql(/* GraphQL */ `
-   query GetUserLibraryQuery($type: MediaType, $userId: Int) {
+   query GetUserLibrary($type: MediaType, $userId: Int) {
       MediaListCollection(type: $type, userId: $userId) {
          lists {
             name
