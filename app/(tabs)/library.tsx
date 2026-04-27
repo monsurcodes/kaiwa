@@ -6,10 +6,9 @@ import { Pressable, RefreshControl, Text, TextInput, View } from "react-native";
 import LibraryMediaCard from "@/components/LibraryMediaCard";
 import { theme } from "@/constants/theme";
 import { MediaType } from "@/lib/graphql/generated/graphql";
-import { refreshUserLibrary } from "@/lib/utils/refreshData";
+import { refreshUserLibrary } from "@/stores/actions/refreshData";
 import { useAuthStore } from "@/stores/authStore";
-
-type FlatLibraryItem = { type: "header"; name: string } | { type: "card"; entry: any };
+import { LibraryListItem } from "@/types";
 
 const Library = () => {
    const { userAnimeLibraryLists, userMangaLibraryLists, userProfile } = useAuthStore();
@@ -26,7 +25,7 @@ const Library = () => {
    const [statusFilter, setStatusFilter] = useState("ALL");
    const [searchQuery, setSearchQuery] = useState("");
 
-   const dynamicSections = useMemo(() => {
+   const sectionOrder = useMemo(() => {
       const order =
          (activeType === MediaType.Anime
             ? userProfile?.mediaListOptions?.animeList?.sectionOrder
@@ -38,11 +37,11 @@ const Library = () => {
    const flattenedData = useMemo(() => {
       const isAnime = activeType === MediaType.Anime;
       const sourceLists = isAnime ? userAnimeLibraryLists : userMangaLibraryLists;
-      const order = dynamicSections.filter((s) => s !== "ALL");
+      const order = sectionOrder.filter((s) => s !== "ALL");
 
       if (!sourceLists) return [];
 
-      const result: FlatLibraryItem[] = [];
+      const result: LibraryListItem[] = [];
 
       order.forEach((sectionName) => {
          if (statusFilter !== "ALL" && sectionName !== statusFilter) return;
@@ -50,14 +49,17 @@ const Library = () => {
          const currentList = sourceLists.find((l) => l?.name === sectionName);
          if (!currentList?.entries) return;
 
-         const filteredEntries = currentList.entries.filter((entry) => {
-            const title = (
-               entry?.media?.title?.english ??
-               entry?.media?.title?.romaji ??
-               ""
-            ).toLowerCase();
-            return title.includes(searchQuery.toLowerCase());
-         });
+         const filteredEntries = currentList.entries.filter(
+            (entry): entry is NonNullable<typeof entry> => {
+               if (!entry) return false;
+               const title = (
+                  entry?.media?.title?.english ??
+                  entry?.media?.title?.romaji ??
+                  ""
+               ).toLowerCase();
+               return title.includes(searchQuery.toLowerCase());
+            },
+         );
 
          if (filteredEntries.length > 0) {
             result.push({ type: "header", name: sectionName });
@@ -78,7 +80,7 @@ const Library = () => {
    }, [
       userAnimeLibraryLists,
       userMangaLibraryLists,
-      dynamicSections,
+      sectionOrder,
       activeType,
       statusFilter,
       searchQuery,
@@ -116,7 +118,7 @@ const Library = () => {
 
          <View className="mt-4" style={{ height: 40 }}>
             <FlashList
-               data={dynamicSections}
+               data={sectionOrder}
                horizontal
                showsHorizontalScrollIndicator={false}
                renderItem={({ item }) => (
@@ -138,7 +140,7 @@ const Library = () => {
             <FlashList
                data={flattenedData}
                keyExtractor={(item, index) =>
-                  item.type === "header" ? `h-${item.name}` : `c-${item.entry.media.id}-${index}`
+                  item.type === "header" ? `h-${item.name}` : `c-${item.entry.media?.id}-${index}`
                }
                getItemType={(item) => item.type}
                showsVerticalScrollIndicator={false}
