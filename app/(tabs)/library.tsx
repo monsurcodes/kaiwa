@@ -6,7 +6,7 @@ import { Pressable, RefreshControl, Text, TextInput, View } from "react-native";
 import LibraryMediaCard from "@/components/LibraryMediaCard";
 import { theme } from "@/constants/theme";
 import { MediaType } from "@/lib/graphql/generated/graphql";
-import { refreshCachedData } from "@/lib/utils/refreshData";
+import { refreshUserLibrary } from "@/lib/utils/refreshData";
 import { useAuthStore } from "@/stores/authStore";
 
 type FlatLibraryItem = { type: "header"; name: string } | { type: "card"; entry: any };
@@ -15,9 +15,10 @@ const Library = () => {
    const { userAnimeLibraryLists, userMangaLibraryLists, userProfile } = useAuthStore();
 
    const [refreshing, setRefreshing] = useState(false);
+
    const onRefresh = async () => {
       setRefreshing(true);
-      await refreshCachedData();
+      await refreshUserLibrary();
       setRefreshing(false);
    };
 
@@ -159,14 +160,16 @@ const Library = () => {
                         </Text>
                      );
                   }
-                  const { media, progress, status } = item.entry;
+                  const { id, media, progress, status } = item.entry;
                   return (
                      <LibraryMediaCard
+                        listEntryId={id}
                         id={media?.id}
                         title={media?.title?.english ?? media?.title?.romaji}
                         image={media?.coverImage?.large}
                         episodes={media?.episodes}
                         chapters={media?.chapters}
+                        volumes={media?.volumes}
                         format={media?.format}
                         type={media?.type}
                         progress={progress}
