@@ -20,22 +20,51 @@ import { GetPopularAnimeQuery } from "@/lib/graphql/queries/getPopularAnime";
 import { GetTrendingAnimeQuery } from "@/lib/graphql/queries/getTrendingAnime";
 import { GetTrendingMangaQuery } from "@/lib/graphql/queries/getTrendingManga";
 import { compareTimestampTodayFirstTomorrowLast, isTimestampToday } from "@/lib/utils/date";
-import { refreshHomeScreenMedia } from "@/lib/utils/refreshData";
+import { refreshHomeScreenMedia } from "@/stores/actions/refreshData";
 import { useAuthStore } from "@/stores/authStore";
 import { useDataStore } from "@/stores/dataStore";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;
 
+interface SearchBarButtonProps {
+   onPress: () => void;
+}
+
+const SearchBarButton = ({ onPress }: SearchBarButtonProps) => (
+   <Pressable onPress={onPress} className="mt-2 rounded-md bg-slate-900/70 p-4">
+      <View className="flex-row items-center">
+         <Search color="white" size={20} />
+         <Text className="ml-2 text-xl text-gray-400/70">What are you looking for?</Text>
+      </View>
+   </Pressable>
+);
+
+interface MediaSectionProps {
+   title: string;
+   data: unknown[] | null | undefined;
+   renderItem: ({ item }: { item: unknown }) => React.ReactElement;
+}
+
+const MediaSection = ({ title, data, renderItem }: MediaSectionProps) => {
+   if (!data || data.length === 0) return null;
+   return (
+      <>
+         <Text className="mb-2 mt-10 text-xl font-semibold text-white">{title}</Text>
+         <FlashList
+            style={{ height: 350, width: "100%" }}
+            data={data}
+            renderItem={renderItem}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+         />
+      </>
+   );
+};
+
 const Index = () => {
    const router = useRouter();
-
    const [refreshing, setRefreshing] = useState(false);
-   const onRefresh = async () => {
-      setRefreshing(true);
-      await refreshHomeScreenMedia();
-      setRefreshing(false);
-   };
 
    const {
       trendingAnime,
@@ -48,106 +77,78 @@ const Index = () => {
 
    const { userAnimeLibraryLists } = useAuthStore();
 
-   const handleSearchPress = () => {
-      router.push("/search");
-   };
-   // trending anime
    const [animeResult] = useQuery({
       query: GetTrendingAnimeQuery,
       pause: Boolean(trendingAnime),
    });
 
-   const { data: animeList, fetching: animeFetching, error: animeError } = animeResult;
-
-   // popular anime
    const [popularAnimeResult] = useQuery({
       query: GetPopularAnimeQuery,
       pause: Boolean(popularAnime),
    });
 
-   const {
-      data: popularAnimeList,
-      fetching: popularAnimeFetching,
-      error: popularAnimeError,
-   } = popularAnimeResult;
-
-   // trending manga
    const [mangaResult] = useQuery({
       query: GetTrendingMangaQuery,
       pause: Boolean(trendingManga),
    });
 
-   const { data: mangaList, fetching: mangaFetching, error: mangaError } = mangaResult;
+   useEffect(() => {
+      const media = animeResult.data?.Page?.media;
+      if (media && !trendingAnime) setTrendingAnime(media);
+   }, [animeResult.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
    useEffect(() => {
-      if (!trendingAnime && animeList?.Page?.media) {
-         setTrendingAnime(animeList.Page.media);
-      }
-   }, [animeList?.Page?.media, setTrendingAnime, trendingAnime]);
+      const media = popularAnimeResult.data?.Page?.media;
+      if (media && !popularAnime) setPopularAnime(media);
+   }, [popularAnimeResult.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
    useEffect(() => {
-      if (!popularAnime && popularAnimeList?.Page?.media) {
-         setPopularAnime(popularAnimeList.Page.media);
-      }
-   }, [popularAnime, popularAnimeList?.Page?.media, setPopularAnime]);
+      const media = mangaResult.data?.Page?.media;
+      if (media && !trendingManga) setTrendingManga(media);
+   }, [mangaResult.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-   useEffect(() => {
-      if (!trendingManga && mangaList?.Page?.media) {
-         setTrendingManga(mangaList.Page.media);
-      }
-   }, [mangaList?.Page?.media, setTrendingManga, trendingManga]);
+   const onRefresh = async () => {
+      setRefreshing(true);
+      await refreshHomeScreenMedia();
+      setRefreshing(false);
+   };
 
-   // TODO: handle errors properly
-   if (animeError) console.error("Error fetching trending anime:", animeError);
-   if (popularAnimeError) console.error("Error fetching popular anime:", popularAnimeError);
-   if (mangaError) console.error("Error fetching trending manga:", mangaError);
+   const trendingAnimeData = trendingAnime ?? animeResult.data?.Page?.media;
+   const popularAnimeData = popularAnime ?? popularAnimeResult.data?.Page?.media;
+   const trendingMangaData = trendingManga ?? mangaResult.data?.Page?.media;
 
-   const shouldShowLoading =
-      (!trendingAnime && animeFetching) ||
-      (!popularAnime && popularAnimeFetching) ||
-      (!trendingManga && mangaFetching);
-
-   const entires = userAnimeLibraryLists
+   const entries = userAnimeLibraryLists
       ?.flatMap((list) => list?.entries ?? [])
       .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
 
-   const releasingEntires = entires
+   const releasingEntries = entries
       ?.filter((entry) => isTimestampToday(entry?.media?.nextAiringEpisode?.airingAt))
-      .sort((firstEntry, secondEntry) =>
+      .sort((a, b) =>
          compareTimestampTodayFirstTomorrowLast(
-            firstEntry?.media?.nextAiringEpisode?.airingAt,
-            secondEntry?.media?.nextAiringEpisode?.airingAt,
+            a?.media?.nextAiringEpisode?.airingAt,
+            b?.media?.nextAiringEpisode?.airingAt,
          ),
       );
 
-   if (shouldShowLoading)
+   const isInitialLoading =
+      (!trendingAnime && animeResult.fetching) ||
+      (!popularAnime && popularAnimeResult.fetching) ||
+      (!trendingManga && mangaResult.fetching);
+
+   if (isInitialLoading) {
       return (
          <View className="flex-1 gap-3">
-            <Pressable onPress={handleSearchPress} className="mt-2 rounded-md bg-slate-900/70 p-4">
-               <View className="flex-row items-center">
-                  <Search color="white" size={20} />
-                  <Text className="ml-2 text-xl text-gray-400/70">What are you looking for?</Text>
-               </View>
-            </Pressable>
-            <View className="flex items-center justify-center">
+            <SearchBarButton onPress={() => router.push("/search")} />
+            <View className="flex-1 items-center justify-center">
                <ActivityIndicator size={30} />
             </View>
          </View>
       );
-
-   const trendingAnimeData = trendingAnime ?? animeList?.Page?.media;
-   const popularAnimeData = popularAnime ?? popularAnimeList?.Page?.media;
-   const trendingMangaData = trendingManga ?? mangaList?.Page?.media;
+   }
 
    return (
       <View className="flex-1 gap-3">
-         {/* search bar */}
-         <Pressable onPress={handleSearchPress} className="mt-2 rounded-md bg-slate-900/70 p-4">
-            <View className="flex-row items-center">
-               <Search color="white" size={20} />
-               <Text className="ml-2 text-xl text-gray-400/70">What are you looking for?</Text>
-            </View>
-         </Pressable>
+         <SearchBarButton onPress={() => router.push("/search")} />
 
          <ScrollView
             className="flex-1"
@@ -163,14 +164,13 @@ const Index = () => {
                />
             }
          >
-            {/* Releasing Today */}
-            {releasingEntires && releasingEntires.length > 0 && (
+            {releasingEntries && releasingEntries.length > 0 && (
                <View>
                   <Text className="mb-2 mt-6 text-xl font-semibold text-white">
                      Releasing Today
                   </Text>
                   <FlashList
-                     data={releasingEntires}
+                     data={releasingEntries}
                      renderItem={({ item }) => <ReleasingTodayCard item={item} />}
                      horizontal
                      showsHorizontalScrollIndicator={false}
@@ -178,95 +178,43 @@ const Index = () => {
                </View>
             )}
 
-            {/* Trending Anime */}
-            {trendingAnimeData && (
-               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Trending Anime</Text>
-            )}
-            {trendingAnimeData && (
-               <FlashList
-                  style={{ height: 350, width: "100%" }}
-                  data={trendingAnimeData}
-                  renderItem={({ item }) => (
-                     <TrendingMediaCard
-                        id={item?.id ?? 0}
-                        mediaType="ANIME"
-                        title={item?.title?.english ?? item?.title?.romaji ?? ""}
-                        score={item?.averageScore ?? 0}
-                        likes={item?.favourites ?? 0}
-                        coverImage={item?.coverImage?.large ?? ""}
-                        bannerImage={item?.bannerImage ?? ""}
-                        description={item?.description ?? "No description available"}
-                        genres={(item?.genres ?? []).filter(
-                           (genre): genre is string => genre !== null,
-                        )}
-                        secondText={item?.studios?.nodes?.[0]?.name ?? "Unknown Studio"}
-                        cardWidth={CARD_WIDTH}
-                     />
-                  )}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-               ></FlashList>
-            )}
+            <MediaSection
+               title="Trending Anime"
+               data={trendingAnimeData}
+               renderItem={({ item }) => (
+                  <TrendingMediaCard
+                     media={item as NonNullable<typeof trendingAnimeData>[number]}
+                     mediaType="ANIME"
+                     cardWidth={CARD_WIDTH}
+                  />
+               )}
+            />
 
-            {/* Popular Anime */}
-            {popularAnimeData && (
-               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Popular Anime</Text>
-            )}
-            {popularAnimeData && (
-               <FlashList
-                  style={{ height: 350, width: "100%" }}
-                  data={popularAnimeData}
-                  renderItem={({ item }) => (
-                     <TrendingMediaCard
-                        id={item?.id ?? 0}
-                        mediaType="ANIME"
-                        title={item?.title?.english ?? item?.title?.romaji ?? ""}
-                        score={item?.averageScore ?? 0}
-                        likes={item?.favourites ?? 0}
-                        coverImage={item?.coverImage?.large ?? ""}
-                        bannerImage={item?.bannerImage ?? ""}
-                        description={item?.description ?? "No description available"}
-                        genres={(item?.genres ?? []).filter(
-                           (genre): genre is string => genre !== null,
-                        )}
-                        secondText={item?.studios?.nodes?.[0]?.name ?? "Unknown Studio"}
-                        cardWidth={CARD_WIDTH}
-                     />
-                  )}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-               ></FlashList>
-            )}
+            <MediaSection
+               title="Popular Anime"
+               data={popularAnimeData}
+               renderItem={({ item }) => (
+                  <TrendingMediaCard
+                     media={item as NonNullable<typeof popularAnimeData>[number]}
+                     mediaType="ANIME"
+                     cardWidth={CARD_WIDTH}
+                  />
+               )}
+            />
 
-            {/* Trending Manga */}
-            {trendingMangaData && (
-               <Text className="mb-2 mt-10 text-xl font-semibold text-white">Trending Manga</Text>
-            )}
-            {trendingMangaData && (
-               <FlashList
-                  style={{ height: 350, width: "100%" }}
-                  data={trendingMangaData}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={({ item }) => (
-                     <TrendingMediaCard
-                        id={item?.id ?? 0}
-                        mediaType="MANGA"
-                        title={item?.title?.english ?? item?.title?.romaji ?? ""}
-                        score={item?.averageScore ?? 0}
-                        likes={item?.favourites ?? 0}
-                        coverImage={item?.coverImage?.large ?? ""}
-                        bannerImage={item?.bannerImage ?? ""}
-                        description={item?.description ?? "No description available"}
-                        genres={(item?.genres ?? []).filter(
-                           (genre): genre is string => genre !== null,
-                        )}
-                        cardWidth={CARD_WIDTH}
-                     />
-                  )}
-               ></FlashList>
-            )}
-            <View className="my-4"></View>
+            <MediaSection
+               title="Trending Manga"
+               data={trendingMangaData}
+               renderItem={({ item }) => (
+                  <TrendingMediaCard
+                     media={item as NonNullable<typeof trendingMangaData>[number]}
+                     mediaType="MANGA"
+                     cardWidth={CARD_WIDTH}
+                  />
+               )}
+            />
+
+            <View className="my-4" />
          </ScrollView>
       </View>
    );
