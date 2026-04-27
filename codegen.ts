@@ -1,9 +1,7 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
-import { ANILIST_API_URL } from "./constants";
-
 const config: CodegenConfig = {
-   schema: ANILIST_API_URL,
+   schema: "https://graphql.anilist.co",
    documents: [
       "app/**/*.tsx",
       "components/**/*.tsx",
