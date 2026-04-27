@@ -7,6 +7,7 @@ export const GetUserLibraryQuery = gql(/* GraphQL */ `
             name
             status
             entries {
+               id
                status
                progress
                media {
@@ -20,6 +21,7 @@ export const GetUserLibraryQuery = gql(/* GraphQL */ `
                   }
                   episodes
                   chapters
+                  volumes
                   format
                   type
                   nextAiringEpisode {
