@@ -14,7 +14,7 @@ import StatsInfo from "@/components/profile/StatsInfo";
 import FloatingButton from "@/components/ui/FloatingButton";
 import { theme } from "@/constants/theme";
 import { useAuthUserDetail } from "@/hooks/useAuthUserDetail";
-import { refreshUserProfile } from "@/lib/utils/refreshData";
+import { refreshUserProfile } from "@/stores/actions/refreshData";
 
 const Profile = () => {
    const router = useRouter();

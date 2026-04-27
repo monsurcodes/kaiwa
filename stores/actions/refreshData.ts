@@ -62,6 +62,7 @@ export const refreshUserLibrary = async () => {
    const preloadUserLibraryImages = (lists: UserLibraryLists) => {
       const urls = lists
          .flatMap((list) => list?.entries)
+         .slice(0, 30)
          .map((entry) => entry?.media?.coverImage?.large)
          .filter(isString);
       Image.prefetch(urls);
@@ -121,6 +122,7 @@ export const refreshUserProfile = async () => {
    }
 };
 
-export const refreshAllData = async () => {
-   await Promise.all([refreshHomeScreenMedia(), refreshUserProfile(), refreshUserLibrary()]);
+export const refreshAppData = async () => {
+   await Promise.all([refreshHomeScreenMedia(), refreshUserProfile()]);
+   await refreshUserLibrary();
 };
