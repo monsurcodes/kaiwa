@@ -2,15 +2,10 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
    schema: "https://graphql.anilist.co",
-   documents: [
-      "app/**/*.tsx",
-      "components/**/*.tsx",
-      "lib/graphql/queries/**/*.ts",
-      "lib/graphql/mutations/**/*.ts",
-   ],
+   documents: ["src/**/*.tsx", "src/**/*.ts"],
    ignoreNoDocuments: true,
    generates: {
-      "./lib/graphql/generated/": {
+      "./src/shared/lib/graphql/generated/": {
          preset: "client",
          config: {
             scalars: {
