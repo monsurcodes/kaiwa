@@ -42,7 +42,7 @@ const rules: RenderRules = {
    },
 };
 
-const MarkdownText = ({ content }: MarkdownTextProps) => {
+export const MarkdownText = ({ content }: MarkdownTextProps) => {
    const safeContent = content || "";
 
    return (
@@ -56,5 +56,3 @@ const markdownStyles = StyleSheet.create({
    body: { color: "white", fontSize: 16 },
    link: { color: "#3b82f6" },
 });
-
-export default MarkdownText;

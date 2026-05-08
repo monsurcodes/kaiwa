@@ -1,19 +1,19 @@
 import { Image } from "expo-image";
 
-import { client } from "@/shared/lib/graphql/client";
-import { MediaType } from "@/shared/lib/graphql/generated/graphql";
-import { GetAuthUserDataQuery } from "@/shared/lib/graphql/queries/getAuthUserData";
-import { GetPopularAnimeQuery } from "@/shared/lib/graphql/queries/getPopularAnime";
-import { GetTrendingAnimeQuery } from "@/shared/lib/graphql/queries/getTrendingAnime";
-import { GetTrendingMangaQuery } from "@/shared/lib/graphql/queries/getTrendingManga";
-import { GetUserLibraryQuery } from "@/shared/lib/graphql/queries/getUserLibrary";
+import { GetPopularAnimeQuery } from "@/features/home-screen/api/getPopularAnime";
+import { GetTrendingAnimeQuery } from "@/features/home-screen/api/getTrendingAnime";
+import { GetTrendingMangaQuery } from "@/features/home-screen/api/getTrendingManga";
 import {
    PopularAnimeMedia,
    TrendingAnimeMedia,
    TrendingMangaMedia,
-   UserLibraryLists,
-   UserProfile,
-} from "@/shared/types";
+} from "@/features/home-screen/types";
+import { GetUserLibraryQuery } from "@/features/library-screen/api/getUserLibrary";
+import { UserLibraryLists } from "@/features/library-screen/types";
+import { GetAuthUserDataQuery } from "@/features/profile-screen/api/getAuthUserData";
+import { UserProfile } from "@/features/profile-screen/types";
+import { client } from "@/shared/lib/graphql/client";
+import { MediaType } from "@/shared/lib/graphql/generated/graphql";
 import { useAuthStore } from "@/stores/authStore";
 import { useDataStore } from "@/stores/dataStore";
 
@@ -22,6 +22,8 @@ const isString = (value: string | null | undefined): value is string =>
 
 export const refreshHomeScreenMedia = async () => {
    const { setTrendingAnime, setPopularAnime, setTrendingManga } = useDataStore.getState();
+
+   console.log("Refreshing home screen media...");
 
    const preloadMediaImages = (
       mediaList: TrendingAnimeMedia | PopularAnimeMedia | TrendingMangaMedia,
@@ -51,24 +53,50 @@ export const refreshHomeScreenMedia = async () => {
       setTrendingManga(trendingMangaResult.data.Page.media);
       preloadMediaImages(trendingMangaResult.data.Page.media);
    }
+
+   console.log("Home screen media refreshed");
+};
+
+export const refreshUserProfile = async () => {
+   const { isLoggedIn, setUserProfile } = useAuthStore.getState();
+
+   if (!isLoggedIn) return;
+
+   console.log("Refreshing user profile...");
+
+   const preloadUserProfileImages = (userProfile: UserProfile) => {
+      const urls = [userProfile.bannerImage, userProfile.avatar?.large].filter(isString);
+      Image.prefetch(urls);
+   };
+
+   const userProfileResult = await client
+      .query(GetAuthUserDataQuery, {}, { requestPolicy: "network-only" })
+      .toPromise();
+
+   if (userProfileResult.data?.Viewer) {
+      setUserProfile(userProfileResult.data.Viewer);
+      preloadUserProfileImages(userProfileResult.data.Viewer);
+   }
+
+   console.log("User profile refreshed");
 };
 
 export const refreshUserLibrary = async () => {
-   const { isLoggedIn, userProfile } = useAuthStore.getState();
+   const { isLoggedIn, userProfile, setUserAnimeLibraryLists, setUserMangaLibraryLists } =
+      useAuthStore.getState();
    if (!isLoggedIn || !userProfile) return;
 
-   const { setUserAnimeLibraryLists, setUserMangaLibraryLists } = useAuthStore.getState();
+   console.log("Refreshing user library...");
 
    const preloadUserLibraryImages = (lists: UserLibraryLists) => {
       const urls = lists
          .flatMap((list) => list?.entries)
-         .slice(0, 30)
          .map((entry) => entry?.media?.coverImage?.large)
          .filter(isString);
       Image.prefetch(urls);
    };
 
-   const [userAnimeLibraryResult, userMangaLibraryResult] = await Promise.all([
+   const [animeResult, mangaResult] = await Promise.all([
       client
          .query(
             GetUserLibraryQuery,
@@ -85,41 +113,16 @@ export const refreshUserLibrary = async () => {
          .toPromise(),
    ]);
 
-   if (
-      userAnimeLibraryResult?.data?.MediaListCollection?.lists &&
-      userAnimeLibraryResult?.data?.MediaListCollection?.lists.length > 0
-   ) {
-      setUserAnimeLibraryLists(userAnimeLibraryResult?.data?.MediaListCollection?.lists);
-      preloadUserLibraryImages(userAnimeLibraryResult?.data?.MediaListCollection?.lists);
+   if (animeResult.data?.MediaListCollection?.lists) {
+      setUserAnimeLibraryLists(animeResult.data.MediaListCollection.lists);
+      preloadUserLibraryImages(animeResult.data.MediaListCollection.lists);
+   }
+   if (mangaResult.data?.MediaListCollection?.lists) {
+      setUserMangaLibraryLists(mangaResult.data.MediaListCollection.lists);
+      preloadUserLibraryImages(mangaResult.data.MediaListCollection.lists);
    }
 
-   if (
-      userMangaLibraryResult?.data?.MediaListCollection?.lists &&
-      userMangaLibraryResult?.data?.MediaListCollection?.lists.length > 0
-   ) {
-      setUserMangaLibraryLists(userMangaLibraryResult?.data?.MediaListCollection?.lists);
-      preloadUserLibraryImages(userMangaLibraryResult?.data?.MediaListCollection?.lists);
-   }
-};
-
-export const refreshUserProfile = async () => {
-   const { isLoggedIn, setUserProfile } = useAuthStore.getState();
-
-   if (!isLoggedIn) return;
-
-   const preloadUserProfileImages = (userProfile: UserProfile) => {
-      const urls = [userProfile.bannerImage, userProfile.avatar?.large].filter(isString);
-      Image.prefetch(urls);
-   };
-
-   const userProfileResult = await client
-      .query(GetAuthUserDataQuery, {}, { requestPolicy: "network-only" })
-      .toPromise();
-
-   if (userProfileResult.data?.Viewer) {
-      setUserProfile(userProfileResult.data.Viewer);
-      preloadUserProfileImages(userProfileResult.data.Viewer);
-   }
+   console.log("User library refreshed");
 };
 
 export const refreshAppData = async () => {

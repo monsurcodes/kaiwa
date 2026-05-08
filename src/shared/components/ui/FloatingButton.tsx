@@ -11,7 +11,7 @@ interface FloatingButtonProps {
    rightPos?: number;
 }
 
-const FloatingButton = ({
+export const FloatingButton = ({
    Icon,
    strokeWidth,
    onPress,
@@ -40,5 +40,3 @@ const styles = StyleSheet.create({
       backgroundColor: theme.bg.overlay,
    },
 });
-
-export default FloatingButton;

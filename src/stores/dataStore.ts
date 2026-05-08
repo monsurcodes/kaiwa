@@ -1,25 +1,21 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type {
-   GetPopularAnimeQuery,
-   GetTrendingAnimeQuery,
-   GetTrendingMangaQuery,
-} from "@/shared/lib/graphql/generated/graphql";
+import {
+   PopularAnimeMedia,
+   TrendingAnimeMedia,
+   TrendingMangaMedia,
+} from "@/features/home-screen/types";
 import { mmkvZustandStorage } from "@/shared/lib/storage/mmkv";
 
-type TrendingAnimeList = NonNullable<NonNullable<GetTrendingAnimeQuery["Page"]>["media"]>;
-type PopularAnimeList = NonNullable<NonNullable<GetPopularAnimeQuery["Page"]>["media"]>;
-type TrendingMangaList = NonNullable<NonNullable<GetTrendingMangaQuery["Page"]>["media"]>;
-
 interface DataState {
-   trendingAnime: TrendingAnimeList | null;
-   popularAnime: PopularAnimeList | null;
-   trendingManga: TrendingMangaList | null;
+   trendingAnime: TrendingAnimeMedia | null;
+   popularAnime: PopularAnimeMedia | null;
+   trendingManga: TrendingMangaMedia | null;
 
-   setTrendingAnime: (data: TrendingAnimeList) => void;
-   setPopularAnime: (data: PopularAnimeList) => void;
-   setTrendingManga: (data: TrendingMangaList) => void;
+   setTrendingAnime: (data: TrendingAnimeMedia) => void;
+   setPopularAnime: (data: PopularAnimeMedia) => void;
+   setTrendingManga: (data: TrendingMangaMedia) => void;
    clearCache: () => void;
 }
 

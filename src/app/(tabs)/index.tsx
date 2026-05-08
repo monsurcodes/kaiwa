@@ -1,7 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { Search } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
    ActivityIndicator,
    Dimensions,
@@ -11,18 +11,11 @@ import {
    Text,
    View,
 } from "react-native";
-import { useQuery } from "urql";
 
-import ReleasingTodayCard from "@/shared/components/ReleasingTodayCard";
-import TrendingMediaCard from "@/shared/components/TrendingMediaCard";
+import { ReleasingTodayCard, TrendingMediaCard, useHomeData } from "@/features/home-screen";
 import { theme } from "@/shared/constants/theme";
-import { GetPopularAnimeQuery } from "@/shared/lib/graphql/queries/getPopularAnime";
-import { GetTrendingAnimeQuery } from "@/shared/lib/graphql/queries/getTrendingAnime";
-import { GetTrendingMangaQuery } from "@/shared/lib/graphql/queries/getTrendingManga";
-import { compareTimestampTodayFirstTomorrowLast, isTimestampToday } from "@/shared/lib/utils/date";
+import { MediaType } from "@/shared/lib/graphql/generated/graphql";
 import { refreshHomeScreenMedia } from "@/stores/actions/refreshData";
-import { useAuthStore } from "@/stores/authStore";
-import { useDataStore } from "@/stores/dataStore";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.8;
@@ -66,74 +59,19 @@ const Index = () => {
    const router = useRouter();
    const [refreshing, setRefreshing] = useState(false);
 
-   const {
-      trendingAnime,
-      popularAnime,
-      trendingManga,
-      setTrendingAnime,
-      setPopularAnime,
-      setTrendingManga,
-   } = useDataStore();
-
-   const { userAnimeLibraryLists } = useAuthStore();
-
-   const [animeResult] = useQuery({
-      query: GetTrendingAnimeQuery,
-      pause: Boolean(trendingAnime),
-   });
-
-   const [popularAnimeResult] = useQuery({
-      query: GetPopularAnimeQuery,
-      pause: Boolean(popularAnime),
-   });
-
-   const [mangaResult] = useQuery({
-      query: GetTrendingMangaQuery,
-      pause: Boolean(trendingManga),
-   });
-
-   useEffect(() => {
-      const media = animeResult.data?.Page?.media;
-      if (media && !trendingAnime) setTrendingAnime(media);
-   }, [animeResult.data]); // eslint-disable-line react-hooks/exhaustive-deps
-
-   useEffect(() => {
-      const media = popularAnimeResult.data?.Page?.media;
-      if (media && !popularAnime) setPopularAnime(media);
-   }, [popularAnimeResult.data]); // eslint-disable-line react-hooks/exhaustive-deps
-
-   useEffect(() => {
-      const media = mangaResult.data?.Page?.media;
-      if (media && !trendingManga) setTrendingManga(media);
-   }, [mangaResult.data]); // eslint-disable-line react-hooks/exhaustive-deps
-
    const onRefresh = async () => {
       setRefreshing(true);
       await refreshHomeScreenMedia();
       setRefreshing(false);
    };
 
-   const trendingAnimeData = trendingAnime ?? animeResult.data?.Page?.media;
-   const popularAnimeData = popularAnime ?? popularAnimeResult.data?.Page?.media;
-   const trendingMangaData = trendingManga ?? mangaResult.data?.Page?.media;
-
-   const entries = userAnimeLibraryLists
-      ?.flatMap((list) => list?.entries ?? [])
-      .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
-
-   const releasingEntries = entries
-      ?.filter((entry) => isTimestampToday(entry?.media?.nextAiringEpisode?.airingAt))
-      .sort((a, b) =>
-         compareTimestampTodayFirstTomorrowLast(
-            a?.media?.nextAiringEpisode?.airingAt,
-            b?.media?.nextAiringEpisode?.airingAt,
-         ),
-      );
-
-   const isInitialLoading =
-      (!trendingAnime && animeResult.fetching) ||
-      (!popularAnime && popularAnimeResult.fetching) ||
-      (!trendingManga && mangaResult.fetching);
+   const {
+      trendingAnimeData,
+      trendingMangaData,
+      popularAnimeData,
+      isInitialLoading,
+      releasingEntries,
+   } = useHomeData();
 
    if (isInitialLoading) {
       return (
@@ -184,7 +122,7 @@ const Index = () => {
                renderItem={({ item }) => (
                   <TrendingMediaCard
                      media={item as NonNullable<typeof trendingAnimeData>[number]}
-                     mediaType="ANIME"
+                     mediaType={MediaType.Anime}
                      cardWidth={CARD_WIDTH}
                   />
                )}
@@ -196,7 +134,7 @@ const Index = () => {
                renderItem={({ item }) => (
                   <TrendingMediaCard
                      media={item as NonNullable<typeof popularAnimeData>[number]}
-                     mediaType="ANIME"
+                     mediaType={MediaType.Anime}
                      cardWidth={CARD_WIDTH}
                   />
                )}
@@ -208,7 +146,7 @@ const Index = () => {
                renderItem={({ item }) => (
                   <TrendingMediaCard
                      media={item as NonNullable<typeof trendingMangaData>[number]}
-                     mediaType="MANGA"
+                     mediaType={MediaType.Manga}
                      cardWidth={CARD_WIDTH}
                   />
                )}

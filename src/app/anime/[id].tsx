@@ -3,21 +3,21 @@ import { SquarePen } from "lucide-react-native";
 import { ActivityIndicator, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-import HeroBanner from "@/shared/components/anime/AnimeHeroBanner";
-import AnimeInfoTable from "@/shared/components/anime/AnimeInfoTable";
-import CharacterList from "@/shared/components/character/CharacterList";
-import GenreList from "@/shared/components/media/GenreList";
-import MediaScreenHeader from "@/shared/components/media/MediaScreenHeader";
-import RecommendationList from "@/shared/components/media/RecommendationList";
-import RelationList from "@/shared/components/media/RelationList";
-import StatsBar from "@/shared/components/media/StatsBar";
-import SynopsisCard from "@/shared/components/media/SynopsisCard";
-import TagList from "@/shared/components/media/TagList";
-import TrailerCard from "@/shared/components/media/TrailerCard";
-import FloatingButton from "@/shared/components/ui/FloatingButton";
-import { useAnimeDetail } from "@/shared/hooks/useAnimeDetail";
-import { useCharacters } from "@/shared/hooks/useCharacters";
-import { useMediaId } from "@/shared/hooks/useMediaId";
+import { AnimeHeroBanner, AnimeInfoTable, useAnimeDetail } from "@/features/anime-detail";
+import {
+   CharacterList,
+   GenreList,
+   MediaScreenHeader,
+   RecommendationList,
+   RelationList,
+   StatsBar,
+   SynopsisCard,
+   TagList,
+   TrailerCard,
+   useCharacters,
+   useMediaId,
+} from "@/features/media-detail";
+import { FloatingButton } from "@/shared/components/ui/FloatingButton";
 
 const Anime = () => {
    const router = useRouter();
@@ -65,7 +65,7 @@ const Anime = () => {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
          >
-            <HeroBanner media={data.Media} />
+            <AnimeHeroBanner media={data.Media} />
             <View className="flex px-4" style={{ gap: 12 }}>
                <StatsBar media={data.Media} />
                <GenreList media={data.Media} />

@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { FuzzyDateInput, MediaListStatus } from "@/shared/lib/graphql/generated/graphql";
+import { UserLibraryLists } from "@/features/library-screen/types";
+import { UserProfile } from "@/features/profile-screen/types";
+import { FuzzyDateInput, MediaListStatus, MediaType } from "@/shared/lib/graphql/generated/graphql";
 import { mmkvZustandStorage } from "@/shared/lib/storage/mmkv";
-import { UserLibraryLists, UserProfile } from "@/shared/types";
 
 interface AuthState {
    token: string | null;
@@ -24,7 +25,7 @@ interface AuthState {
    updateEntryOptimistically: (
       mediaId: number,
       updates: OptimisticUpdateFields,
-      type: "ANIME" | "MANGA",
+      type: MediaType,
    ) => void;
 }
 
@@ -76,7 +77,9 @@ export const useAuthStore = create<AuthState>()(
          updateEntryOptimistically: (mediaId, updates, type) => {
             set((state) => {
                const lists =
-                  type === "ANIME" ? state.userAnimeLibraryLists : state.userMangaLibraryLists;
+                  type === MediaType.Anime
+                     ? state.userAnimeLibraryLists
+                     : state.userMangaLibraryLists;
 
                if (!lists) return state;
 
@@ -87,7 +90,7 @@ export const useAuthStore = create<AuthState>()(
                   ),
                }));
 
-               return type === "ANIME"
+               return type === MediaType.Anime
                   ? { userAnimeLibraryLists: updatedLists }
                   : { userMangaLibraryLists: updatedLists };
             });

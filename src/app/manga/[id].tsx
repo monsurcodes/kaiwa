@@ -3,21 +3,21 @@ import { SquarePen } from "lucide-react-native";
 import { ActivityIndicator, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-import CharacterList from "@/shared/components/character/CharacterList";
-import MangaHeroBanner from "@/shared/components/manga/MangaHeroBanner";
-import MangaInfoTable from "@/shared/components/manga/MangaInfoTable";
-import GenreList from "@/shared/components/media/GenreList";
-import MediaScreenHeader from "@/shared/components/media/MediaScreenHeader";
-import RecommendationList from "@/shared/components/media/RecommendationList";
-import RelationList from "@/shared/components/media/RelationList";
-import StatsBar from "@/shared/components/media/StatsBar";
-import SynopsisCard from "@/shared/components/media/SynopsisCard";
-import TagList from "@/shared/components/media/TagList";
-import TrailerCard from "@/shared/components/media/TrailerCard";
-import FloatingButton from "@/shared/components/ui/FloatingButton";
-import { useCharacters } from "@/shared/hooks/useCharacters";
-import { useMangaDetail } from "@/shared/hooks/useMangaDetail";
-import { useMediaId } from "@/shared/hooks/useMediaId";
+import { MangaHeroBanner, MangaInfoTable, useMangaDetail } from "@/features/manga-detail";
+import {
+   CharacterList,
+   GenreList,
+   MediaScreenHeader,
+   RecommendationList,
+   RelationList,
+   StatsBar,
+   SynopsisCard,
+   TagList,
+   TrailerCard,
+   useCharacters,
+   useMediaId,
+} from "@/features/media-detail";
+import { FloatingButton } from "@/shared/components/ui/FloatingButton";
 
 const Manga = () => {
    const router = useRouter();

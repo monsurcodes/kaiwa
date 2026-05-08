@@ -8,7 +8,7 @@ interface HtmlTextProps {
    numberOfLines?: number | undefined;
 }
 
-const HtmlText = ({
+export const HtmlText = ({
    htmlContent,
    lineHeight,
    textColor = "white",
@@ -53,5 +53,3 @@ const HtmlText = ({
       />
    );
 };
-
-export default HtmlText;

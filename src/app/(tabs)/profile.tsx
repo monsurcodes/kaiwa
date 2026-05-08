@@ -3,17 +3,19 @@ import { Settings } from "lucide-react-native";
 import { useState } from "react";
 import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native";
 
-import AboutCard from "@/shared/components/profile/AboutCard";
-import FavAnimeList from "@/shared/components/profile/FavAnimeList";
-import FavCharacterList from "@/shared/components/profile/FavCharacterList";
-import FavMangaList from "@/shared/components/profile/FavMangaList";
-import FavStaffList from "@/shared/components/profile/FavStaffList";
-import FavStudioList from "@/shared/components/profile/FavStudioList";
-import ProfileHeroBanner from "@/shared/components/profile/ProfileHeroBanner";
-import StatsInfo from "@/shared/components/profile/StatsInfo";
-import FloatingButton from "@/shared/components/ui/FloatingButton";
+import {
+   AboutCard,
+   FavAnimeList,
+   FavCharacterList,
+   FavMangaList,
+   FavStaffList,
+   FavStudioList,
+   ProfileHeroBanner,
+   StatsInfo,
+   useAuthUserDetail,
+} from "@/features/profile-screen";
+import { FloatingButton } from "@/shared/components/ui/FloatingButton";
 import { theme } from "@/shared/constants/theme";
-import { useAuthUserDetail } from "@/shared/hooks/useAuthUserDetail";
 import { refreshUserProfile } from "@/stores/actions/refreshData";
 
 const Profile = () => {
