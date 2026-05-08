@@ -1,0 +1,103 @@
+import NetInfo from "@react-native-community/netinfo";
+import { authExchange } from "@urql/exchange-auth";
+import { retryExchange } from "@urql/exchange-retry";
+import { cacheExchange, Client, errorExchange, type Exchange, fetchExchange } from "urql";
+import { fromPromise, mergeMap, pipe } from "wonka";
+
+import { ANILIST_API_URL } from "@/shared/constants";
+import { useAuthStore } from "@/stores/authStore";
+
+// Utility to wait for connection
+const waitForConnection = () => {
+   return new Promise<void>((resolve) => {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+         if (state.isConnected && state.isInternetReachable) {
+            unsubscribe();
+            resolve();
+         }
+      });
+   });
+};
+
+// Custom exchange to pause operations when offline
+const offlineExchange: Exchange =
+   ({ forward }) =>
+   (ops$) => {
+      return forward(
+         pipe(
+            ops$,
+            mergeMap((operation) => {
+               return fromPromise(
+                  NetInfo.fetch().then(async (state) => {
+                     if (!state.isConnected || !state.isInternetReachable) {
+                        await waitForConnection();
+                     }
+                     return operation;
+                  }),
+               );
+            }),
+         ),
+      );
+   };
+
+export const client = new Client({
+   url: ANILIST_API_URL,
+   preferGetMethod: false,
+   exchanges: [
+      offlineExchange,
+      cacheExchange,
+      retryExchange({
+         initialDelayMs: 1000,
+         maxNumberAttempts: 3,
+         retryIf: (error, _operation) => Boolean(error.networkError),
+      }),
+      authExchange(async (utils) => {
+         return {
+            addAuthToOperation(operation) {
+               const token = useAuthStore.getState().token;
+
+               if (!token) return operation;
+
+               return utils.appendHeaders(operation, {
+                  Authorization: `Bearer ${token}`,
+               });
+            },
+            didAuthError(error, _operation) {
+               // Check for 401 Unauthorized or specific AniList auth errors
+               return error.response?.status === 401;
+            },
+            async refreshAuth() {
+               // If the token is invalid or expired, trigger a logout
+               // In AniList, tokens are long-lived, so usually you just log out
+               useAuthStore.getState().logout();
+            },
+            willAuthError(_operation) {
+               const { token, expiresAt } = useAuthStore.getState();
+
+               if (!token) return false;
+
+               // If expiresAt exists, check if the current time has passed it
+               if (expiresAt && Date.now() > expiresAt * 1000) {
+                  return true;
+               }
+
+               return false;
+            },
+         };
+      }),
+      errorExchange({
+         onError(error) {
+            if (error.networkError) {
+            }
+         },
+      }),
+      fetchExchange,
+   ],
+   fetchOptions: {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json",
+         Accept: "application/json",
+      },
+   },
+});

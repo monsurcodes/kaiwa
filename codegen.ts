@@ -1,18 +1,11 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
-import { ANILIST_API_URL } from "./constants";
-
 const config: CodegenConfig = {
-   schema: ANILIST_API_URL,
-   documents: [
-      "app/**/*.tsx",
-      "components/**/*.tsx",
-      "lib/graphql/queries/**/*.ts",
-      "lib/graphql/mutations/**/*.ts",
-   ],
+   schema: "https://graphql.anilist.co",
+   documents: ["src/**/*.tsx", "src/**/*.ts"],
    ignoreNoDocuments: true,
    generates: {
-      "./lib/graphql/generated/": {
+      "./src/shared/lib/graphql/generated/": {
          preset: "client",
          config: {
             scalars: {

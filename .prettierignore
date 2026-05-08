@@ -1,6 +1,7 @@
 .expo
 .husky
 .vscode
+.cursor
 node_modules
 dist
 coverage

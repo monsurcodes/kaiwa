@@ -50,4 +50,4 @@ app-example
 project-snapshot.md
 
 # generated graphql types
-lib/graphql/generated
+src/shared/lib/graphql/generated
